@@ -19,11 +19,31 @@ class CanDisplay:
     can0 = can.interface.Bus(channel='can0', bustype='socketcan_native')
 
     def __init__(self):
-        self.batteries = self.get_number_batteries()
+        self.NUMBER_OF_BATTERIES = self.get_number_batteries()
         self.SLAVE_CELLS = [[None for i in range(48)],
-                [None for i in range((self.batteries - 31) * 4)],
+                [None for i in range((self.NUMBER_OF_BATTERIES - 31) * 4)],
                 [None for i in range(28)],
                 [None for i in range(48)]]
+        self.SYSTEM_VOLTAGE = None
+        self.INVERTER_VOLTAGE = None
+        self.PSU_VOLTAGE = None
+        self.SYSTEM_CURRENT = None
+        self.HALL_CURRENT = None
+        self.SHUNT_CURRENT = None
+        self.M800_TEMPERATURE = None
+        self.R3000_TEMPERATURE = None
+        self.DIODE_TEMPERATURE = None
+        self.CONTACTOR_TEMPERATURE = None
+        self.SYSTEM_STATE = None
+        self.SOC = None
+        self.SOH = None
+        self.CIRCUIT_BREAKER_STATUS = None
+        self.CIRCUIT_BREAKER_RELAY = None
+        self.CONTACTOR_STATUS = None
+        self.FIRMWARE_VERSION = None
+        self.INSTANT_POWER = None
+        self.CUMULATIVE_ENERGY = None
+        self.TIMESTAMP = None
         self.layout = Layout()
 
     def send_request(self, arbitration_id, data):
@@ -38,8 +58,7 @@ class CanDisplay:
         while True:
             try:
                 if time.time() - start_time > 5:
-                    self.send_request(0x181fe8f4, [
-                                 0x14, 0, 0, 0, 0, 0, 0, 0])
+                    self.send_request(0x181fe8f4, [0x14, 0, 0, 0, 0, 0, 0, 0])
                     startTime = time.time()
                 message = self.can0.recv(10.0)
                 if message:
@@ -69,11 +88,13 @@ class CanDisplay:
         for i in range(packets):
             first = 4*(i+1)
             last = first + 4
-            self.SLAVE_CELLS[int(slave_num)][index + i] = int(data[first:last], 16)
+            self.SLAVE_CELLS[int(slave_num)][index + i] = float(int(data[first:last], 16)) / 1000.0
 
-    def make_cell_table(self):
-        while self.SLAVE_CELLS[1][-1] == None:
-            self.SLAVE_CELLS[1].pop()
+    def make_cell_voltage_table(self):
+        table = Table(show_header=True,
+                title="Cell Values",
+                header_style="bold magenta",
+                box=box.ROUNDED)
 
     def read_can_messages(self):
         msg = self.can0.recv(10.0)
