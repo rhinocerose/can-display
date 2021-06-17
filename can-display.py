@@ -1,5 +1,6 @@
 import can
 import binascii
+import time
 
 from rich import box
 from rich.layout import Layout
@@ -18,16 +19,48 @@ class CanDisplay:
     can0 = can.interface.Bus(channel='can0', bustype='socketcan_native')
 
     def __init__(self):
-        self.SLAVE_CELLS = [[None for i in range(48)], [None for i in range(32)], [None for i in range(28)], [None for i in range(48)]]
+        self.batteries = self.get_number_batteries()
+        self.SLAVE_CELLS = [[None for i in range(48)],
+                [None for i in range((self.batteries - 31) * 4)],
+                [None for i in range(28)],
+                [None for i in range(48)]]
         self.layout = Layout()
-        
+
+    def send_request(self, arbitration_id, data):
+        send_params = can.Message(
+            arbitration_id=arbitration_id, data=data, extended_id=True)
+        self.can0.send(send_params)
+
+    def get_number_batteries(self):
+        batteries = 0
+        start_time = time.time()
+        self.send_request(0x181fe8f4, [0x14, 0, 0, 0, 0, 0, 0, 0])
+        while True:
+            try:
+                if time.time() - start_time > 5:
+                    self.send_request(0x181fe8f4, [
+                                 0x14, 0, 0, 0, 0, 0, 0, 0])
+                    startTime = time.time()
+                message = self.can0.recv(10.0)
+                if message:
+                    data = binascii.hexlify(message.data)
+                    frame = hex(message.arbitration_id)
+                    if frame[2:10] == "1814f4e8" and int(data[0:2], 16) == 1:
+                        batteries = int(data[10:12], 16)
+                        break
+                else:
+                    batteries = 4
+            except Exception as e:
+                print("error is ", str(e))
+        return  batteries
+
     def add_color(self, string, color):
         text = "[" + color + "]" + str(string) + "[/" + color + "]"
         return text
 
     def new_line(self, number):
         return "\n" * number
-    
+
     def make_cell_voltage_array(self, data, slave_num):
         index = int(data[:2], 16) - 1
         print("Slave Number: " + str(slave_num))
@@ -36,12 +69,12 @@ class CanDisplay:
         for i in range(packets):
             first = 4*(i+1)
             last = first + 4
-            self.SLAVE_CELLS[int(slave_num)][index + i] = data[first:last]
+            self.SLAVE_CELLS[int(slave_num)][index + i] = int(data[first:last], 16)
 
     def make_cell_table(self):
         while self.SLAVE_CELLS[1][-1] == None:
             self.SLAVE_CELLS[1].pop()
-        
+
     def read_can_messages(self):
         msg = self.can0.recv(10.0)
         if msg:
