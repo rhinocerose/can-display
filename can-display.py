@@ -2,6 +2,8 @@ import can
 import binascii
 import time
 
+from datetime import datetime
+
 from rich import box
 from rich.layout import Layout
 from rich.panel import Panel
@@ -26,6 +28,10 @@ class CanDisplay:
                 [0.0 for i in range((self.NUMBER_OF_BATTERIES - 31) * 4)],
                 [0.0 for i in range(28)],
                 [0.0 for i in range(48)]]
+        self.SLAVE1_LENGTH = len(self.SLAVE_CELLS[0])/4
+        self.SLAVE2_LENGTH = len(self.SLAVE_CELLS[1])/4
+        self.SLAVE3_LENGTH = len(self.SLAVE_CELLS[2])/4
+        self.SLAVE4_LENGTH = len(self.SLAVE_CELLS[3])/4
         self.SYSTEM_VOLTAGE = None
         self.INVERTER_VOLTAGE = None
         self.PSU_VOLTAGE = None
@@ -84,7 +90,13 @@ class CanDisplay:
     def new_line(self, number):
         return "\n" * number
 
+    def make_timestamp(self):
+        time = datetime.now().time()
+        now = datetime.now()
+        self.TIMESTAMP = now.strftime("%m") + '/' + str(int(now.strftime("%d"))).zfill(2) + '/' + now.strftime("%Y") + "   " + str(time)
+
     def make_cell_voltage_array(self, data, slave_num):
+        self.read_can_messages()
         index = int(data[:2], 16) - 1
         if DEBUG:
             print("Slave Number: " + str(slave_num))
@@ -104,7 +116,7 @@ class CanDisplay:
             color = "blue"
         else:
             color = "white"
-        return self.add_color(str(value), color)
+        return self.add_color(str("%.3f" % round(value, 3)), color)
 
 
     def check_sparsity(self):
@@ -128,45 +140,44 @@ class CanDisplay:
             table = Table(show_header=True,
                     header_style="bold magenta",
                     box=box.ROUNDED)
-            table.add_column("SLAVE 1", style="bold", min_width=20)
-            table.add_column("BATTERY #", style="bold", min_width=20)
-            table.add_column("VOLTAGE", style="bold", min_width=20)
-            table.add_column("SLAVE 2", style="bold", min_width=20)
-            table.add_column("BATTERY #", style="bold", min_width=20)
-            table.add_column("VOLTAGE", style="bold", min_width=20)
-            table.add_column("SLAVE 3", style="bold", min_width=20)
-            table.add_column("BATTERY #", style="bold", min_width=20)
-            table.add_column("VOLTAGE", style="bold", min_width=20)
-            table.add_column("SLAVE 4", style="bold", min_width=20)
-            table.add_column("BATTERY #", style="bold", min_width=20)
-            table.add_column("VOLTAGE", style="bold", min_width=20)
+            table.add_column("BATTERY #", style="bold", min_width=10)
+            table.add_column("VOLTAGE", style="bold", min_width=10)
+            table.add_column("BATTERY #", style="bold", min_width=10)
+            table.add_column("VOLTAGE", style="bold", min_width=10)
+            table.add_column("BATTERY #", style="bold", min_width=10)
+            table.add_column("VOLTAGE", style="bold", min_width=10)
+            table.add_column("BATTERY #", style="bold", min_width=10)
+            table.add_column("VOLTAGE", style="bold", min_width=10)
             i = 0
             for j in range(len(self.SLAVE_CELLS[i])):
                 battery = int(j / 4) + 1
                 cell_value1 = self.SLAVE_CELLS[0][j]
                 cell_value4 = self.SLAVE_CELLS[3][j]
+                batt_num1 = str(i+1) + '-' + str(battery) + " (" + str(battery) + ")"
+                batt_num4 = str(i+4) + '-' + str(battery) + " (" + str(int(battery + self.SLAVE1_LENGTH + self.SLAVE2_LENGTH + self.SLAVE3_LENGTH)) + ")"
                 try:
                     cell_value2 = self.SLAVE_CELLS[1][j]
-                    batt_num2 = str(i+2) + '-' + str(battery)
+                    batt_num2 = str(i+2) + '-' + str(battery) + " (" + str(int(battery + self.SLAVE1_LENGTH)) + ")"
                 except IndexError as error:
                     cell_value2 = "     "
                     batt_num2 = "    "
                 try:
                     cell_value3 = self.SLAVE_CELLS[2][j]
-                    batt_num3 = str(i+3) + '-' + str(battery)
+                    batt_num3 = str(i+3) + '-' + str(battery) + " (" + str(int(battery + self.SLAVE1_LENGTH + self.SLAVE2_LENGTH)) + ")"
                 except IndexError as error:
                     cell_value3 = "     "
                     batt_num3 = "    "
-                table.add_row(str(i+1), str(i+1) + '-' + str(battery), str(cell_value1),
-                              str(i+2), batt_num2, str(cell_value2),
-                              str(i+3), batt_num3, str(cell_value3),
-                              str(i+4), str(i+4) + '-' + str(battery), str(cell_value4),
+                table.add_row(batt_num1, str(cell_value1),
+                              batt_num2, str(cell_value2),
+                              batt_num3, str(cell_value3),
+                              batt_num4, str(cell_value4),
                               )
             return Panel(table)
 
     def read_can_messages(self):
         msg = self.can0.recv(10.0)
         if msg:
+            self.make_timestamp()
             data = binascii.hexlify(msg.data).decode(encoding='UTF-8', errors='strict')
             frame_id = hex(msg.arbitration_id)
             if frame_id[2:10] in self.CELL_VOLTAGE_FRAMES:
@@ -175,8 +186,9 @@ class CanDisplay:
                     print(str(self.SLAVE_CELLS))
 
     def make_layout(self) -> Layout:
+        time = Panel(self.TIMESTAMP)
         self.layout.split_column(
-            Layout(name="header", size=3),
+            Layout(time, name="header", size=3),
             Layout(self.make_cell_voltage_table())
         )
 
@@ -186,8 +198,5 @@ if __name__ == '__main__':
     display = CanDisplay()
     with Live(display.make_layout(), screen=True) as live:
        while True:
-            display.read_can_messages()
-            time.sleep(1)
-            live.update(display.make_layout())
-    #while True:
-        #display.read_can_messages()
+           display.read_can_messages()
+           live.update(display.make_layout())
