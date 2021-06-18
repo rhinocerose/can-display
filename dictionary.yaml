@@ -4,18 +4,21 @@ adah:
   start_bit: 6
   end_bit: 10
   value: null
+  units: Ah
 cdah:
   frame_id: 1834cce8
   mux_bit: 3
   start_bit: 2
   end_bit: 6
   value: null
+  units: Ah
 circuit_breaker_control_status:
   frame_id: 42
   mux_bit: 0
   start_bit: 0
   end_bit: 0
   value: null
+  units: Boolean
 circuit_breaker_status:
   frame_id: 41
   mux_bit: 0
@@ -27,124 +30,137 @@ contactor_control:
   mux_bit: 0
   start_bit: 0
   end_bit: 0
-  value: null
+  units: Boolean
 contactor_temperature:
   frame_id: 1834cce8
   mux_bit: 0
   start_bit: 14
   end_bit: 16
   value: null
+  units: C
 cumulative_energy:
   frame_id: 42006
   mux_bit: 0
   start_bit: 0
   end_bit: 0
   value: null
+  units: kWh
 diode_temperature:
   frame_id: 1834cce8
   mux_bit: 0
   start_bit: 12
   end_bit: 14
   value: null
+  units: C
 firmware_release:
   frame_id: 1834cce8
   mux_bit: 4
   start_bit: 12
   end_bit: 16
   value: null
+  units: None
 firmware_version:
   frame_id: 1834cce8
   mux_bit: 4
   start_bit: 10
   end_bit: 12
   value: null
+  units: None
 hall_current:
   frame_id: 1834cce8
   mux_bit: 1
   start_bit: 6
   end_bit: 10
   value: null
+  units: A
 instant_power:
   frame_id: 42005
   mux_bit: 0
   start_bit: 0
   end_bit: 0
   value: null
+  units: kW
 inverter_voltage:
   frame_id: 1834cce8
   mux_bit: 2
   start_bit: 6
   end_bit: 10
   value: null
+  units: V
 m800_temperature:
   frame_id: 1834cce8
   mux_bit: 0
   start_bit: 10
   end_bit: 12
   value: null
-number_of_monoblocks:
-  frame_id: 40003
-  mux_bit: 0
-  start_bit: 0
-  end_bit: 0
-  value: null
+  units: C
 power_supply_voltage:
   frame_id: 1834cce8
   mux_bit: 2
   start_bit: 10
   end_bit: 14
   value: null
+  units: V
 r3000_temperature:
   frame_id: 41004
   mux_bit: 0
   start_bit: 0
   end_bit: 0
   value: null
+  units: C
 shunt_current:
   frame_id:  1834cce8
   mux_bit: 1
   start_bit: 10
   end_bit: 14
   value: null
+  units: A
 soc:
   frame_id:  1834cce8
   mux_bit: 1
   start_bit: 14
   end_bit: 16
   value: null
+  units: %
 soh:
   frame_id: 1834cce8
   mux_bit: 2
   start_bit: 14
   end_bit: 16
   value: null
+  units: %
 system_current:
   frame_id:  1834cce8
   mux_bit: 1
   start_bit: 2
   end_bit: 6
   value: null
+  units: A
 system_state:
   frame_id: 42002
   mux_bit: 0
   start_bit: 2
   end_bit: 4
   value: null
+  units: Boolean
 system_status:
   frame_id: 40
   mux_bit: 0
   start_bit: 0
   end_bit: 0
   value: null
+  units: None
 system_temperature:
   frame_id: 41000
   mux_bit: 0
   start_bit: 10
   end_bit: 12
   value: null
+  units: C
 system_voltage:
   frame_id:  1834cce8
   mux_bit: 2
   start_bit: 2
   end_bit: 6
   value: null
+  units: V
