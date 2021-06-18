@@ -110,7 +110,9 @@ class CanDisplay:
         self.make_cell_voltage_table()
 
     def color_cell_voltages(self, value):
-        if float(value) > 3.5:
+        if 3.75 > float(value) > 3.5:
+            color = "dim red"
+        elif float(value) > 3.75:
             color = "red"
         elif float(value) < 1.5:
             color = "blue"
@@ -175,7 +177,7 @@ class CanDisplay:
             return Panel(table)
 
     def read_can_messages(self):
-        msg = self.can0.recv(10.0)
+        msg = self.can0.recv(90.0)
         if msg:
             self.make_timestamp()
             data = binascii.hexlify(msg.data).decode(encoding='UTF-8', errors='strict')
