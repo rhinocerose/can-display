@@ -5,6 +5,8 @@ adah:
   end_bit: 10
   value: null
   units: Ah
+  multiplier: 0.1
+  offset: 1600
 cdah:
   frame_id: 1834cce8
   mux_bit: 3
@@ -12,6 +14,8 @@ cdah:
   end_bit: 6
   value: null
   units: Ah
+  multiplier: 0.1
+  offset: 1600
 circuit_breaker_control_status:
   frame_id: 42
   mux_bit: 0
@@ -19,6 +23,8 @@ circuit_breaker_control_status:
   end_bit: 0
   value: null
   units: Boolean
+  multiplier: 0.1
+  offset: 1600
 circuit_breaker_status:
   frame_id: 41
   mux_bit: 0
@@ -26,12 +32,16 @@ circuit_breaker_status:
   end_bit: 0
   value: null
   units: Boolean
+  multiplier: 0.1
+  offset: 1600
 contactor_control:
   frame_id: 43
   mux_bit: 0
   start_bit: 0
   end_bit: 0
   units: Boolean
+  multiplier: 0.1
+  offset: 1600
 contactor_temperature:
   frame_id: 1834cce8
   mux_bit: 0
@@ -39,6 +49,8 @@ contactor_temperature:
   end_bit: 16
   value: null
   units: C
+  multiplier: 0.1
+  offset: 1600
 cumulative_energy:
   frame_id: 42006
   mux_bit: 0
@@ -46,6 +58,8 @@ cumulative_energy:
   end_bit: 0
   value: null
   units: kWh
+  multiplier: 0.1
+  offset: 1600
 diode_temperature:
   frame_id: 1834cce8
   mux_bit: 0
@@ -53,6 +67,8 @@ diode_temperature:
   end_bit: 14
   value: null
   units: C
+  multiplier: 0.1
+  offset: 1600
 firmware_release:
   frame_id: 1834cce8
   mux_bit: 4
@@ -60,6 +76,8 @@ firmware_release:
   end_bit: 16
   value: null
   units: None
+  multiplier: 0.1
+  offset: 1600
 firmware_version:
   frame_id: 1834cce8
   mux_bit: 4
@@ -67,6 +85,8 @@ firmware_version:
   end_bit: 12
   value: null
   units: None
+  multiplier: 0.1
+  offset: 1600
 hall_current:
   frame_id: 1834cce8
   mux_bit: 1
@@ -74,6 +94,8 @@ hall_current:
   end_bit: 10
   value: null
   units: A
+  multiplier: 0.1
+  offset: 1600
 instant_power:
   frame_id: 42005
   mux_bit: 0
@@ -81,6 +103,8 @@ instant_power:
   end_bit: 0
   value: null
   units: kW
+  multiplier: 0.1
+  offset: 1600
 inverter_voltage:
   frame_id: 1834cce8
   mux_bit: 2
@@ -88,6 +112,8 @@ inverter_voltage:
   end_bit: 10
   value: null
   units: V
+  multiplier: 0.1
+  offset: 1600
 m800_temperature:
   frame_id: 1834cce8
   mux_bit: 0
@@ -95,6 +121,8 @@ m800_temperature:
   end_bit: 12
   value: null
   units: C
+  multiplier: 0.1
+  offset: 1600
 power_supply_voltage:
   frame_id: 1834cce8
   mux_bit: 2
@@ -102,6 +130,8 @@ power_supply_voltage:
   end_bit: 14
   value: null
   units: V
+  multiplier: 0.1
+  offset: 1600
 r3000_temperature:
   frame_id: 41004
   mux_bit: 0
@@ -109,6 +139,8 @@ r3000_temperature:
   end_bit: 0
   value: null
   units: C
+  multiplier: 0.1
+  offset: 1600
 shunt_current:
   frame_id:  1834cce8
   mux_bit: 1
@@ -116,6 +148,8 @@ shunt_current:
   end_bit: 14
   value: null
   units: A
+  multiplier: 0.1
+  offset: 1600
 soc:
   frame_id:  1834cce8
   mux_bit: 1
@@ -123,6 +157,8 @@ soc:
   end_bit: 16
   value: null
   units: %
+  multiplier: 0.1
+  offset: 1600
 soh:
   frame_id: 1834cce8
   mux_bit: 2
@@ -130,6 +166,8 @@ soh:
   end_bit: 16
   value: null
   units: %
+  multiplier: 0.1
+  offset: 1600
 system_current:
   frame_id:  1834cce8
   mux_bit: 1
@@ -137,6 +175,8 @@ system_current:
   end_bit: 6
   value: null
   units: A
+  multiplier: 0.1
+  offset: 1600
 system_state:
   frame_id: 42002
   mux_bit: 0
@@ -144,6 +184,8 @@ system_state:
   end_bit: 4
   value: null
   units: Boolean
+  multiplier: 0.1
+  offset: 1600
 system_status:
   frame_id: 40
   mux_bit: 0
@@ -151,6 +193,8 @@ system_status:
   end_bit: 0
   value: null
   units: None
+  multiplier: 0.1
+  offset: 1600
 system_temperature:
   frame_id: 41000
   mux_bit: 0
@@ -158,6 +202,8 @@ system_temperature:
   end_bit: 12
   value: null
   units: C
+  multiplier: 0.1
+  offset: 1600
 system_voltage:
   frame_id:  1834cce8
   mux_bit: 2
@@ -165,3 +211,5 @@ system_voltage:
   end_bit: 6
   value: null
   units: V
+  multiplier: 0.1
+  offset: 1600
