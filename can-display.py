@@ -95,6 +95,24 @@ class CanDisplay:
                 title="Cell Values",
                 header_style="bold magenta",
                 box=box.ROUNDED)
+        table.add_column("SLAVE 1", style="bold", min_width=20)
+        table.add_column("BATTERY #", style="bold", min_width=20)
+        table.add_column("VOLTAGE", style="bold", min_width=20)
+        table.add_column("SLAVE 2", style="bold", min_width=20)
+        table.add_column("BATTERY #", style="bold", min_width=20)
+        table.add_column("VOLTAGE", style="bold", min_width=20)
+        table.add_column("SLAVE 3", style="bold", min_width=20)
+        table.add_column("BATTERY #", style="bold", min_width=20)
+        table.add_column("VOLTAGE", style="bold", min_width=20)
+        table.add_column("SLAVE 4", style="bold", min_width=20)
+        table.add_column("BATTERY #", style="bold", min_width=20)
+        table.add_column("VOLTAGE", style="bold", min_width=20)
+        for i in range(len(self.SLAVE_CELLS)):
+            for j in self.SLAVE_CELLS[i]:
+                try:
+                    table.add_rows(str(i+1), str(j+1), str(self.SLAVE_CELLS[i][j+1]),
+                except IndexError as error:
+                    pass
 
     def read_can_messages(self):
         msg = self.can0.recv(10.0)
