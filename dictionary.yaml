@@ -25,6 +25,7 @@ circuit_breaker_status:
   start_bit: 0
   end_bit: 0
   value: null
+  units: Boolean
 contactor_control:
   frame_id: 43
   mux_bit: 0
