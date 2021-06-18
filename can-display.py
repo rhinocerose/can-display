@@ -92,7 +92,6 @@ class CanDisplay:
 
     def make_cell_voltage_table(self):
         table = Table(show_header=True,
-                title="Cell Values",
                 header_style="bold magenta",
                 box=box.ROUNDED)
         table.add_column("SLAVE 1", style="bold", min_width=20)
@@ -107,12 +106,24 @@ class CanDisplay:
         table.add_column("SLAVE 4", style="bold", min_width=20)
         table.add_column("BATTERY #", style="bold", min_width=20)
         table.add_column("VOLTAGE", style="bold", min_width=20)
-        for i in range(len(self.SLAVE_CELLS)):
-            for j in self.SLAVE_CELLS[i]:
-                try:
-                    table.add_rows(str(i+1), str(j+1), str(self.SLAVE_CELLS[i][j+1]),
-                except IndexError as error:
-                    pass
+        i = 0
+        for j in range(len(self.SLAVE_CELLS[i])):
+            cell_value1 = str(self.SLAVE_CELLS[0][j])
+            cell_value4 = str(self.SLAVE_CELLS[3][j])
+            try:
+                cell_value2 = str(self.SLAVE_CELLS[1][j])
+            except IndexError as error:
+                cell_value2 = "     "
+            try:
+                cell_value3 = str(self.SLAVE_CELLS[2][j])
+            except IndexError as error:
+                cell_value3 = "     "
+            table.add_row(str(i+1), str(j+1), cell_value1,
+                          str(i+2), str(j+1), cell_value2,
+                          str(i+3), str(j+1), cell_value3,
+                          str(i+4), str(j+1), cell_value4,
+                          )
+        return Panel(table)
 
     def read_can_messages(self):
         msg = self.can0.recv(10.0)
@@ -120,11 +131,22 @@ class CanDisplay:
             data = binascii.hexlify(msg.data).decode(encoding='UTF-8', errors='strict')
             frame_id = hex(msg.arbitration_id)
             if frame_id[2:10] in self.CELL_VOLTAGE_FRAMES:
-                print("Frame ID: " + str(frame_id))
                 self.make_cell_voltage_array(data, frame_id[-1])
-                print("SLAVE 1: " + str(self.SLAVE_CELLS))
+                self.make_cell_voltage_table()
+
+    def make_layout(self) -> Layout:
+        self.layout.split_column(
+            Layout(name="header", size=3),
+            Layout(self.make_cell_voltage_table())
+        )
+
+        return self.layout
 
 if __name__ == '__main__':
     display = CanDisplay()
-    while True:
-        display.read_can_messages()
+    with Live(display.make_layout(), screen=True) as live:
+        while True:
+            time.sleep(1)
+            live.update(display.make_layout())
+    #while True:
+        #display.read_can_messages()
