@@ -1,175 +1,150 @@
 adah:
-  frame: !!python/tuple
-  - 42004
-  - 3
-  - 6
-  - 10
+  frame_id: 1834cce8
+  mux_bit: 3
+  start_bit: 6
+  end_bit: 10
   value: null
 cdah:
-  frame: !!python/tuple
-  - 42003
-  - 3
-  - 2
-  - 6
+  frame_id: 1834cce8
+  mux_bit: 3
+  start_bit: 2
+  end_bit: 6
   value: null
 circuit_breaker_control_status:
-  frame: !!python/tuple
-  - 42
-  - 0
-  - 0
-  - 0
+  frame_id: 42
+  mux_bit: 0
+  start_bit: 0
+  end_bit: 0
   value: null
 circuit_breaker_status:
-  frame: !!python/tuple
-  - 41
-  - 0
-  - 0
-  - 0
+  frame_id: 41
+  mux_bit: 0
+  start_bit: 0
+  end_bit: 0
   value: null
 contactor_control:
-  frame: !!python/tuple
-  - 43
-  - 0
-  - 0
-  - 0
+  frame_id: 43
+  mux_bit: 0
+  start_bit: 0
+  end_bit: 0
   value: null
 contactor_temperature:
-  frame: !!python/tuple
-  - 41002
-  - 0
-  - 14
-  - 16
+  frame_id: 1834cce8
+  mux_bit: 0
+  start_bit: 14
+  end_bit: 16
   value: null
 cumulative_energy:
-  frame: !!python/tuple
-  - 42006
-  - 0
-  - 0
-  - 0
+  frame_id: 42006
+  mux_bit: 0
+  start_bit: 0
+  end_bit: 0
   value: null
 diode_temperature:
-  frame: !!python/tuple
-  - 41001
-  - 0
-  - 12
-  - 14
+  frame_id: 1834cce8
+  mux_bit: 0
+  start_bit: 12
+  end_bit: 14
   value: null
 firmware_release:
-  frame: !!python/tuple
-  - 42008
-  - 4
-  - 12
-  - 16
+  frame_id: 1834cce8
+  mux_bit: 4
+  start_bit: 12
+  end_bit: 16
   value: null
 firmware_version:
-  frame: !!python/tuple
-  - 42007
-  - 4
-  - 10
-  - 12
+  frame_id: 1834cce8
+  mux_bit: 4
+  start_bit: 10
+  end_bit: 12
   value: null
 hall_current:
-  frame: !!python/tuple
-  - 43001
-  - 1
-  - 6
-  - 10
+  frame_id: 1834cce8
+  mux_bit: 1
+  start_bit: 6
+  end_bit: 10
   value: null
 instant_power:
-  frame: !!python/tuple
-  - 42005
-  - 0
-  - 0
-  - 0
+  frame_id: 42005
+  mux_bit: 0
+  start_bit: 0
+  end_bit: 0
   value: null
 inverter_voltage:
-  frame: !!python/tuple
-  - 40001
-  - 2
-  - 6
-  - 10
+  frame_id: 1834cce8
+  mux_bit: 2
+  start_bit: 6
+  end_bit: 10
   value: null
 m800_temperature:
-  frame: !!python/tuple
-  - 41003
-  - 0
-  - 10
-  - 12
+  frame_id: 1834cce8
+  mux_bit: 0
+  start_bit: 10
+  end_bit: 12
   value: null
 number_of_monoblocks:
-  frame: !!python/tuple
-  - 40003
-  - 0
-  - 0
-  - 0
+  frame_id: 40003
+  mux_bit: 0
+  start_bit: 0
+  end_bit: 0
   value: null
 power_supply_voltage:
-  frame: !!python/tuple
-  - 40002
-  - 2
-  - 10
-  - 14
+  frame_id: 1834cce8
+  mux_bit: 2
+  start_bit: 10
+  end_bit: 14
   value: null
 r3000_temperature:
-  frame: !!python/tuple
-  - 41004
-  - 0
-  - 0
-  - 0
+  frame_id: 41004
+  mux_bit: 0
+  start_bit: 0
+  end_bit: 0
   value: null
 shunt_current:
-  frame: !!python/tuple
-  - 43002
-  - 1
-  - 10
-  - 14
+  frame_id:  1834cce8
+  mux_bit: 1
+  start_bit: 10
+  end_bit: 14
   value: null
 soc:
-  frame: !!python/tuple
-  - 42000
-  - 1
-  - 14
-  - 16
+  frame_id:  1834cce8
+  mux_bit: 1
+  start_bit: 14
+  end_bit: 16
   value: null
 soh:
-  frame: !!python/tuple
-  - 42001
-  - 2
-  - 14
-  - 16
+  frame_id: 1834cce8
+  mux_bit: 2
+  start_bit: 14
+  end_bit: 16
   value: null
 system_current:
-  frame: !!python/tuple
-  - 43000
-  - 1
-  - 2
-  - 6
+  frame_id:  1834cce8
+  mux_bit: 1
+  start_bit: 2
+  end_bit: 6
   value: null
 system_state:
-  frame: !!python/tuple
-  - 42002
-  - 0
-  - 2
-  - 4
+  frame_id: 42002
+  mux_bit: 0
+  start_bit: 2
+  end_bit: 4
   value: null
 system_status:
-  frame: !!python/tuple
-  - 40
-  - 0
-  - 0
-  - 0
+  frame_id: 40
+  mux_bit: 0
+  start_bit: 0
+  end_bit: 0
   value: null
 system_temperature:
-  frame: !!python/tuple
-  - 41000
-  - 0
-  - 10
-  - 12
+  frame_id: 41000
+  mux_bit: 0
+  start_bit: 10
+  end_bit: 12
   value: null
 system_voltage:
-  frame: !!python/tuple
-  - 40000
-  - 2
-  - 2
-  - 6
+  frame_id:  1834cce8
+  mux_bit: 2
+  start_bit: 2
+  end_bit: 6
   value: null
