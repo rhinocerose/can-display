@@ -91,14 +91,11 @@ class CanDisplay:
         return "\n" * number
 
     def make_timestamp(self):
-        time = datetime.now().time()
-        now = datetime.now()
-        self.TIMESTAMP = now.strftime("%m") + '/' + str(int(now.strftime("%d"))).zfill(2) + '/' + now.strftime("%Y") + ' ' + str(time)
+        self.TIMESTAMP = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     def make_header(self):
         header = self.add_color("LAST UPDATED:  ", "red") + self.add_color(self.TIMESTAMP, "blue")
         return Panel(header, style = Style(color="red", bold=True))
-
 
     def make_cell_voltage_array(self, data, slave_num):
         self.read_can_messages()
@@ -125,7 +122,6 @@ class CanDisplay:
             color = "white"
         return self.add_color(str("%.3f" % round(value, 3)), color)
 
-
     def check_sparsity(self):
         sparse = False
         for i in range(len(self.SLAVE_CELLS)):
@@ -134,6 +130,7 @@ class CanDisplay:
                     print(str(self.SLAVE_CELLS[i][j]))
                 if self.SLAVE_CELLS[i][j] == 0.0:
                     sparse = True
+                    break
                 else:
                     pass
         if DEBUG:
