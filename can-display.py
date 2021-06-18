@@ -93,7 +93,12 @@ class CanDisplay:
     def make_timestamp(self):
         time = datetime.now().time()
         now = datetime.now()
-        self.TIMESTAMP = now.strftime("%m") + '/' + str(int(now.strftime("%d"))).zfill(2) + '/' + now.strftime("%Y") + "   " + str(time)
+        self.TIMESTAMP = now.strftime("%m") + '/' + str(int(now.strftime("%d"))).zfill(2) + '/' + now.strftime("%Y") + ' ' + str(time)
+
+    def make_header(self):
+        header = self.add_color("LAST UPDATED:  ", "red") + self.add_color(self.TIMESTAMP, "blue")
+        return Panel(header, style = Style(color="red", bold=True))
+
 
     def make_cell_voltage_array(self, data, slave_num):
         self.read_can_messages()
@@ -174,7 +179,7 @@ class CanDisplay:
                               batt_num3, str(cell_value3),
                               batt_num4, str(cell_value4),
                               )
-            return Panel(table)
+            return table
 
     def read_can_messages(self):
         msg = self.can0.recv(90.0)
@@ -188,10 +193,10 @@ class CanDisplay:
                     print(str(self.SLAVE_CELLS))
 
     def make_layout(self) -> Layout:
-        time = Panel(self.TIMESTAMP)
+        #time = Panel(self.TIMESTAMP, style = Style(color="red", bold=True))
         self.layout.split_column(
-            Layout(time, name="header", size=3),
-            Layout(self.make_cell_voltage_table())
+            Layout(self.make_header(), name="header", size=3),
+            Layout(self.make_cell_voltage_table()),
         )
 
         return self.layout
