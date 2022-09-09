@@ -20,7 +20,7 @@ class CanDisplay:
     CELL_VOLTAGE_FRAMES = ['1811f580', '1811f581', '1811f582', '1811f583']
     ERROR_FRAMES = ['183fcce8']
 
-    can0 = can.interface.Bus(channel='can0', bustype='socketcan_native')
+    can0 = can.interface.Bus(channel='vcan0', bustype='socketcan')
 
     def __init__(self):
         self.NUMBER_OF_BATTERIES = self.get_number_batteries()
@@ -58,7 +58,7 @@ class CanDisplay:
 
     def send_request(self, arbitration_id, data):
         send_params = can.Message(
-            arbitration_id=arbitration_id, data=data, extended_id=True)
+            arbitration_id=arbitration_id, data=data, is_extended_id=True)
         self.can0.send(send_params)
 
     def get_number_batteries(self):
