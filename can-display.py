@@ -18,6 +18,7 @@ class CanDisplay:
     "This is a class to display parsed CAN bus data in a TUI"
 
     CELL_VOLTAGE_FRAMES = ['1811f580', '1811f581', '1811f582', '1811f583']
+    CELL_VOLT_FRAMES = ['740']
     ERROR_FRAMES = ['183fcce8']
 
     can0 = can.interface.Bus(channel='vcan0', bustype='socketcan')
