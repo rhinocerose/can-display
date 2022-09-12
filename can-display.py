@@ -12,77 +12,67 @@ from rich.table import Table
 from rich.live import Live
 from rich.text import Text
 
-DEBUG = False
+import cantools
+
+DEBUG = True
+
+class BMSParameters:
+    def __init__(self, sku):
+        self.cells_per_string = None
+        self.number_of_strings = None
+        self.volt_array = None
+        self.temp_array = None
+        self.soh_array = None
+        self.country = None
+        self.sku = sku
+        self.soc - None
+        self.soh = None
+        self.j1a_current = None
+        get_sku_parameters(sku)
+
+    def get_sku_parameters(self, sku):
+        if sku == 18:
+            self.number_of_strings = 4
+            self.cells_per_string = 12
+            self.create_arrays()
+        else:
+            print("SKU Unknown")
+
+    def create_arrays(self):
+        self.volt_array = [[0 for x in range(cells_per_string)] for y in range(number_of_strings)]
+        self.soh_array = [[0 for x in range(cells_per_string)] for y in range(number_of_strings)]
+        self.temp_array = [[0 for x in range(cells_per_string)] for y in range(number_of_strings)]
+
+    def update_parameters(self, message):
+        decoded = db.decode_message(message.arbitration_id, message.data)
+        frame_id = message.arbitration_id
+        if frame_id == 1830:
+            self.country = decoded['country']
+        elif frame_id == 1827:
+            self.soc = decoded['state_of_charge']
+
+    def update_arrays(self, string, starting_cell, number_of_cells):
+        if string == 1:
+            pass
+
 
 class CanDisplay:
     "This is a class to display parsed CAN bus data in a TUI"
 
     CELL_VOLTAGE_FRAMES = ['1811f580', '1811f581', '1811f582', '1811f583']
     CELL_VOLT_FRAMES = ['740']
+    CELL_TEMP_FRAMES = ['741']
+    CELL_SOH_FRAMES = ['751']
+    STATUS_FRAMES = ['720', '721', '722', '723', '724', '725', '726', '727', '730', '750', '752']
     ERROR_FRAMES = ['183fcce8']
 
     can0 = can.interface.Bus(channel='vcan0', bustype='socketcan')
 
-    def __init__(self):
-        self.NUMBER_OF_BATTERIES = self.get_number_batteries()
-        self.SLAVE_CELLS = [[0.0 for i in range(48)],
-                [0.0 for i in range((self.NUMBER_OF_BATTERIES - 31) * 4)],
-                [0.0 for i in range(28)],
-                [0.0 for i in range(48)]]
-        self.SLAVE1_LENGTH = len(self.SLAVE_CELLS[0])/4
-        self.SLAVE2_LENGTH = len(self.SLAVE_CELLS[1])/4
-        self.SLAVE3_LENGTH = len(self.SLAVE_CELLS[2])/4
-        self.SLAVE4_LENGTH = len(self.SLAVE_CELLS[3])/4
-        self.SYSTEM_VOLTAGE = None
-        self.INVERTER_VOLTAGE = None
-        self.PSU_VOLTAGE = None
-        self.SYSTEM_CURRENT = None
-        self.HALL_CURRENT = None
-        self.SHUNT_CURRENT = None
-        self.M800_TEMPERATURE = None
-        self.R3000_TEMPERATURE = None
-        self.DIODE_TEMPERATURE = None
-        self.CONTACTOR_TEMPERATURE = None
-        self.SYSTEM_STATE = None
-        self.SOC = None
-        self.SOH = None
-        self.CIRCUIT_BREAKER_STATUS = None
-        self.CIRCUIT_BREAKER_RELAY = None
-        self.CONTACTOR_STATUS = None
-        self.FIRMWARE_VERSION = None
-        self.INSTANT_POWER = None
-        self.CUMULATIVE_ENERGY = None
+    def __init__(self, sku, interface):
+        self.bms_param = BMSParameters(sku)
         self.TIMESTAMP = None
         self.layout = Layout()
-        while self.check_sparsity():
-            self.read_can_messages()
-
-    def send_request(self, arbitration_id, data):
-        send_params = can.Message(
-            arbitration_id=arbitration_id, data=data, is_extended_id=True)
-        self.can0.send(send_params)
-
-    def get_number_batteries(self):
-        batteries = 0
-        start_time = time.time()
-        self.send_request(0x181fe8f4, [0x14, 0, 0, 0, 0, 0, 0, 0])
-        while True:
-            try:
-                if time.time() - start_time > 5:
-                    self.send_request(0x181fe8f4, [0x14, 0, 0, 0, 0, 0, 0, 0])
-                    startTime = time.time()
-                message = self.can0.recv(10.0)
-                if message:
-                    data = binascii.hexlify(message.data)
-                    frame = hex(message.arbitration_id)
-                    if frame[2:10] == "1814f4e8" and int(data[0:2], 16) == 1:
-                        batteries = int(data[10:12], 16)
-                        break
-                else:
-                    batteries = 4
-            except Exception as e:
-                print("error is ", str(e))
-        return  batteries
+        self.interface = interface;
 
     def add_color(self, string, color):
         text = "[" + color + "]" + str(string) + "[/" + color + "]"
@@ -200,8 +190,21 @@ class CanDisplay:
         return self.layout
 
 if __name__ == '__main__':
-    display = CanDisplay()
-    with Live(display.make_layout(), screen=True) as live:
-       while True:
-           display.read_can_messages()
-           live.update(display.make_layout())
+    db = cantools.database.load_file('data/anzen-raymond-48cell-can1.dbc')
+    db.messages
+    data = db.get_message_by_name('Status')
+    can0 = can.interface.Bus(channel='vcan0', bustype='socketcan')
+    while True:
+        message = can0.recv()
+        try:
+            print(message.arbitration_id)
+            print(db.decode_message(message.arbitration_id, message.data))
+        except:
+            print("unknown frame")
+    # print(data.signals)
+    # db.decode_message(0x750, bytearray([56,00,25]))
+    # display = CanDisplay()
+    # with Live(display.make_layout(), screen=True) as live:
+    #    while True:
+    #        display.read_can_messages()
+    #        live.update(display.make_layout())
