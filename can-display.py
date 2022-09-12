@@ -30,18 +30,55 @@ class BMSParameters:
         self.j1a_current = None
         self.j1b_current = None
         self.k7_current = None
-        self.system_current = None
-        self.system_voltage = None
-        self.max_regen_current = None
-        self.max_discharge_current = None
-        self.max_charge_current = None
-        self.max_cell_volt = None
-        self.max_cell_temp = None
-        self.min_cell_volt = None
-        self.min_cell_temp = None
+        self.measured_battery_current = None
+        self.measured_battery_voltage = None
+        self.maximum_regen_current = None
+        self.maximum_discharge_current = None
+        self.maximum_charge_current = None
+        self.maximum_measured_cell_voltage = None
+        self.maximum_measured_module_temp = None
+        self.minimum_measured_cell_voltage = None
+        self.minimum_measured_module_temp = None
         self.connector_v4_voltage = None
         self.volt_average = None
         self.insulation_resistance = None
+        self.number_chargers_connected = None
+        self.contactor_k5_status = None
+        self.contactor_k4_status = None
+        self.contactor_k7_status = None
+        self.bms_supply_voltage_high_alarm_status = None
+        self.bms_supply_voltage_low_alarm_status = None
+        self.bms_module_temp_high_alarm_status = None
+        self.regen_current_high_alarm_status = None
+        self.discharge_current_high_alarm_status = None
+        self.pack_voltage_high_alarm_status = None
+        self.pack_voltage_low_alarm_status = None
+        self.cell_voltage_high_alarm_status = None
+        self.cell_voltage_low_alarm_status = None
+        self.discharge_cell_temp_high_limit = None
+        self.discharge_cell_temp_low_limit = None
+        self.charge_cell_temp_high_limit = None
+        self.charge_cell_temp_low_limit = None
+        self.cell_voltage_differential_limit = None
+        self.cell_temp_differential_limit = None
+        self.soc_high_limit = None
+        self.soc_low_limit = None
+        self.cell_soc_differential_limit = None
+        self.insulation_resistance_limit = None
+        self.contactor_k4_position = None
+        self.contactor_k5_position = None
+        self.contactor_k7_position = None
+        self.impending_disconnect = None
+        self.slave1_temperature_balance_error = None
+        self.slave2_temperature_balance_error = None
+        self.slave3_temperature_balance_error = None
+        self.slave1_volt_balance_error = None
+        self.slave2_volt_balance_error = None
+        self.slave3_volt_balance_error = None
+        self.cell_volt_acquisition_open_wire = None
+        self.bms_internal_can_status = None
+        self.power_mode_state = None
+        self.isns001_status = None
         get_sku_parameters(sku)
 
     def get_sku_parameters(self, sku):
@@ -53,43 +90,73 @@ class BMSParameters:
             print("SKU Unknown")
 
     def create_arrays(self):
-        self.volt_array = [[0 for x in range(cells_per_string)] for y in range(number_of_strings)]
-        self.soh_array = [[0 for x in range(cells_per_string)] for y in range(number_of_strings)]
-        self.temp_array = [[0 for x in range(cells_per_string)] for y in range(number_of_strings)]
+        self.volt_array = [[0.0 for x in range(cells_per_string)] for y in range(number_of_strings)]
+        self.soh_array = [[0.0 for x in range(cells_per_string)] for y in range(number_of_strings)]
+        self.temp_array = [[0.0 for x in range(cells_per_string)] for y in range(number_of_strings)]
 
     def update_parameters(self, message):
         decoded = db.decode_message(message.arbitration_id, message.data)
         frame_id = message.arbitration_id
         if frame_id == 1824:
-            self.system_current = decoded['measured_battery_current']
-            self.system_voltage = decoded['measured_battery_voltage']
-        elif frame_id == 1872:
-            sef.soh = decoded['minimum_state_of_health']
+            self.measured_battery_current = decoded['measured_battery_current']
+            self.measured_battery_voltage = decoded['measured_battery_voltage']
+        elif frame_id == 1825:
+            self.maximum_discharge_current = decoded['maximum_discharge_current']
+            self.maximum_regen_current = decoded['maximum_regen_current']
+        elif frame_id == 1826:
+            self.maximum_measured_module_temp = decoded['maximum_measured_module_temp']
+            self.minimum_measured_module_temp = decoded['minimum_measured_module_temp']
+            self.minimum_measured_cell_voltage = decoded['minimum_measured_cell_voltage']
+            self.maximum_measured_cell_voltage = decoded['maximum_measured_cell_voltage']
         elif frame_id == 1827:
             self.soc = decoded['state_of_charge']
-        elif frame_id == 1874:
-            self.country = decoded['country']
+            self.connector_v4_voltage = decoded['truck_connector_v4_voltage']
+        elif frame_id == 1856:
+            self.update_arrays('volt', decoded)
+        elif frame_id == 1857:
+            self.update_arrays('temp', decoded)
+        elif frame_id == 1872:
+            sef.soh = decoded['minimum_state_of_health']
+            self.insulation_resistance = decoded['insulation_resistance']
+        elif frame_id == 1873:
+            self.update_arrays('soh', decoded)
+        elif frame_id in (1816, 1874):
+            self.country = decoded['configuration_country']
 
-    def update_arrays(self, string, starting_cell, number_of_cells):
-        if string == 1:
-            pass
+
+
+    def update_arrays(self, reading_type, decoded):
+        if reading_type == 'soh':
+            string = decoded['cell_soh_string_number']
+            number_of_cells = decoded['cell_soh_number_of_readings']
+            starting_cell = decoded['cell_soh_starting_cell']
+            value = 'cell_soh_reading_'
+            array = self.soh_array
+        elif reading_type == 'temp':
+            string = decoded['temperature_string_number']
+            number_of_cells = decoded['temperature_number_of_readings']
+            starting_cell = decoded['temperature_starting_cell']
+            value = 'temperature_reading_'
+            array = self.temp_array
+        elif reading_type = 'volt':
+            string = decoded['voltage_string_number']
+            number_of_cells = decoded['voltage_number_of_readings']
+            starting_cell = decoded['voltage_starting_cell']
+            value = 'voltage_reading_'
+            array = self.volt_array
+
+        for i in number_of_cells:
+            reading = value + str(i)
+            array[starting_cell - 1 + i][string - 1] = decoded[value]
 
 
 class CanDisplay:
     "This is a class to display parsed CAN bus data in a TUI"
 
-    CELL_VOLTAGE_FRAMES = ['1811f580', '1811f581', '1811f582', '1811f583']
-    CELL_VOLT_FRAMES = ['740']
-    CELL_TEMP_FRAMES = ['741']
-    CELL_SOH_FRAMES = ['751']
-    STATUS_FRAMES = ['720', '721', '722', '723', '724', '725', '726', '727', '730', '750', '752']
-    ERROR_FRAMES = ['183fcce8']
-
-    can0 = can.interface.Bus(channel='vcan0', bustype='socketcan')
 
     def __init__(self, sku, interface):
         self.bms_param = BMSParameters(sku)
-        self.TIMESTAMP = None
+        self.timestamp = None
         self.layout = Layout()
         self.interface = interface;
 
@@ -101,10 +168,10 @@ class CanDisplay:
         return "\n" * number
 
     def make_timestamp(self):
-        self.TIMESTAMP = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     def make_header(self):
-        header = self.add_color("LAST UPDATED:  ", "red") + self.add_color(self.TIMESTAMP, "blue")
+        header = self.add_color("LAST UPDATED:  ", "red") + self.add_color(self.timestamp, "blue")
         return Panel(header, style = Style(color="red", bold=True))
 
     def make_cell_voltage_array(self, data, slave_num):
@@ -189,15 +256,16 @@ class CanDisplay:
             return table
 
     def read_can_messages(self):
-        msg = self.can0.recv(90.0)
+        msg = self.interface.recv(90.0)
         if msg:
             self.make_timestamp()
-            data = binascii.hexlify(msg.data).decode(encoding='UTF-8', errors='strict')
-            frame_id = hex(msg.arbitration_id)
-            if frame_id[2:10] in self.CELL_VOLTAGE_FRAMES:
-                self.make_cell_voltage_array(data, frame_id[-1])
-                if DEBUG:
-                    print(str(self.SLAVE_CELLS))
+            self.bms_params.update_parameters(msg)
+            # data = binascii.hexlify(msg.data).decode(encoding='UTF-8', errors='strict')
+            # frame_id = hex(msg.arbitration_id)
+            # if frame_id[2:10] in self.CELL_VOLTAGE_FRAMES:
+            #     self.make_cell_voltage_array(data, frame_id[-1])
+            #     if DEBUG:
+            #         print(str(self.SLAVE_CELLS))
 
     def make_layout(self) -> Layout:
         #time = Panel(self.TIMESTAMP, style = Style(color="red", bold=True))
@@ -210,8 +278,6 @@ class CanDisplay:
 
 if __name__ == '__main__':
     db = cantools.database.load_file('data/anzen-raymond-48cell-can1.dbc')
-    db.messages
-    data = db.get_message_by_name('Status')
     can0 = can.interface.Bus(channel='vcan0', bustype='socketcan')
     while True:
         message = can0.recv()
