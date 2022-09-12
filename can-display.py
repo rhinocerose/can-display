@@ -28,6 +28,20 @@ class BMSParameters:
         self.soc - None
         self.soh = None
         self.j1a_current = None
+        self.j1b_current = None
+        self.k7_current = None
+        self.system_current = None
+        self.system_voltage = None
+        self.max_regen_current = None
+        self.max_discharge_current = None
+        self.max_charge_current = None
+        self.max_cell_volt = None
+        self.max_cell_temp = None
+        self.min_cell_volt = None
+        self.min_cell_temp = None
+        self.connector_v4_voltage = None
+        self.volt_average = None
+        self.insulation_resistance = None
         get_sku_parameters(sku)
 
     def get_sku_parameters(self, sku):
@@ -46,10 +60,15 @@ class BMSParameters:
     def update_parameters(self, message):
         decoded = db.decode_message(message.arbitration_id, message.data)
         frame_id = message.arbitration_id
-        if frame_id == 1830:
-            self.country = decoded['country']
+        if frame_id == 1824:
+            self.system_current = decoded['measured_battery_current']
+            self.system_voltage = decoded['measured_battery_voltage']
+        elif frame_id == 1872:
+            sef.soh = decoded['minimum_state_of_health']
         elif frame_id == 1827:
             self.soc = decoded['state_of_charge']
+        elif frame_id == 1874:
+            self.country = decoded['country']
 
     def update_arrays(self, string, starting_cell, number_of_cells):
         if string == 1:
@@ -201,9 +220,7 @@ if __name__ == '__main__':
             print(db.decode_message(message.arbitration_id, message.data))
         except:
             print("unknown frame")
-    # print(data.signals)
-    # db.decode_message(0x750, bytearray([56,00,25]))
-    # display = CanDisplay()
+    # display = CanDisplay(can0, 18)
     # with Live(display.make_layout(), screen=True) as live:
     #    while True:
     #        display.read_can_messages()
