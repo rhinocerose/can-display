@@ -16,33 +16,8 @@ import cantools
 
 DEBUG = True
 
-class BMSParameters:
-    def __init__(self, sku):
-        self.cells_per_string = None
-        self.number_of_strings = None
-        self.volt_array = None
-        self.temp_array = None
-        self.soh_array = None
-        self.country = None
-        self.sku = sku
-        self.soc - None
-        self.soh = None
-        self.j1a_current = None
-        self.j1b_current = None
-        self.k7_current = None
-        self.measured_battery_current = None
-        self.measured_battery_voltage = None
-        self.maximum_regen_current = None
-        self.maximum_discharge_current = None
-        self.maximum_charge_current = None
-        self.maximum_measured_cell_voltage = None
-        self.maximum_measured_module_temp = None
-        self.minimum_measured_cell_voltage = None
-        self.minimum_measured_module_temp = None
-        self.connector_v4_voltage = None
-        self.volt_average = None
-        self.insulation_resistance = None
-        self.number_chargers_connected = None
+class Alarms:
+    def __init__(self):
         self.contactor_k5_status = None
         self.contactor_k4_status = None
         self.contactor_k7_status = None
@@ -79,6 +54,36 @@ class BMSParameters:
         self.bms_internal_can_status = None
         self.power_mode_state = None
         self.isns001_status = None
+
+
+class BMSParameters:
+    def __init__(self, sku):
+        self.cells_per_string = None
+        self.number_of_strings = None
+        self.volt_array = None
+        self.temp_array = None
+        self.soh_array = None
+        self.country = None
+        self.sku = sku
+        self.soc - None
+        self.soh = None
+        self.j1a_current = None
+        self.j1b_current = None
+        self.k7_current = None
+        self.measured_battery_current = None
+        self.measured_battery_voltage = None
+        self.maximum_regen_current = None
+        self.maximum_discharge_current = None
+        self.maximum_charge_current = None
+        self.maximum_measured_cell_voltage = None
+        self.maximum_measured_module_temp = None
+        self.minimum_measured_cell_voltage = None
+        self.minimum_measured_module_temp = None
+        self.connector_v4_voltage = None
+        self.volt_average = None
+        self.insulation_resistance = None
+        self.number_chargers_connected = None
+        self.status = Alarms()
         get_sku_parameters(sku)
 
     def get_sku_parameters(self, sku):
@@ -124,7 +129,6 @@ class BMSParameters:
             self.country = decoded['configuration_country']
 
 
-
     def update_arrays(self, reading_type, decoded):
         if reading_type == 'soh':
             string = decoded['cell_soh_string_number']
@@ -150,8 +154,47 @@ class BMSParameters:
             array[starting_cell - 1 + i][string - 1] = decoded[value]
 
 
+    def find_voltage_extremes(self):
+        arr_return = self.volt_array
+        for i, blah in enumerate(self.monoblock_voltages):
+            if i ==  self.monoblock_voltages.index(max(self.monoblock_voltages)):
+                arr_return[i] = self.add_color(str("%.3f" % round(val,3)) + "  MAX", self.VOLT_MAX_COLOR)
+            elif i ==  self.monoblock_voltages.index(min(self.monoblock_voltages)):
+                arr_return[i] = self.add_color(str("%.3f" % round(val,3)) + "  MIN", self.VOLT_MIN_COLOR)
+            else:
+                arr_return[i] = self.add_color(str("%.3f" % round(val,3)), self.VOLT_COLOR)
+        return arr_return
+
+
+    def find_temperature_extremes(self):
+        arr_return = [None for x in range(len(self.monoblock_voltages))]
+        for i, blah in enumerate(self.monoblock_temperatures):
+            val = self.monoblock_temperatures[i] - 40
+            if i == self.monoblock_temperatures.index(max(self.monoblock_temperatures)):
+                arr_return[i] = self.add_color(str(val) + "  MAX", self.TEMPERATURE_MAX_COLOR)
+            elif i ==  self.monoblock_temperatures.index(min(self.monoblock_temperatures)):
+                arr_return[i] = self.add_color(str(val) + "  MIN", self.TEMPERATURE_MIN_COLOR)
+            else:
+                arr_return[i] = self.add_color(val, self.TEMPERATURE_COLOR)
+        return arr_return
+
 class CanDisplay:
     "This is a class to display parsed CAN bus data in a TUI"
+
+    TITLE_COLOR = "bold red"
+    VALUE_LABEL_COLOR = "bold green"
+    VOLT_MAX_COLOR = "bold red"
+    VOLT_MIN_COLOR = "bold blue"
+    TEMPERATURE_MAX_COLOR = "bold red"
+    TEMPERATURE_MIN_COLOR = "bold blue"
+    VOLT_COLOR = "dim magenta"
+    TEMPERATURE_COLOR = "dim green"
+    STATE_COLOR = "cyan"
+    ERROR_STATE_COLOR = "bold red"
+    GENERAL_VALUE_COLOR = "white"
+
+    HEADER_PANEL = "[green]Anzen BMS Modbus Interpreter[/green]"
+    HEADER_STYLE = Style(color="red", bold=True)
 
 
     def __init__(self, sku, interface):
@@ -170,23 +213,22 @@ class CanDisplay:
     def make_timestamp(self):
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    def make_header(self):
-        header = self.add_color("LAST UPDATED:  ", "red") + self.add_color(self.timestamp, "blue")
-        return Panel(header, style = Style(color="red", bold=True))
 
-    def make_cell_voltage_array(self, data, slave_num):
-        self.read_can_messages()
-        index = int(data[:2], 16) - 1
-        if DEBUG:
-            print("Slave Number: " + str(slave_num))
-            print("Cell Index:   " + str(index + 1))
-        packets = int((len(data)/4)-1)
-        for i in range(packets):
-            first = 4*(i+1)
-            last = first + 4
-            temp_val = float(int(data[first:last], 16)) / 1000.0
-            self.SLAVE_CELLS[int(slave_num)][index + i] = self.color_cell_voltages(temp_val)
-        self.make_cell_voltage_table()
+    def make_header(self):
+        header = Panel(self.HEADER_PANEL + self.timestamp(), style=self.HEADER_STYLE)
+        return header
+
+    def make_cell_values_table(self, sting_num):
+        table = Table(show_header=True,
+                      title="Values",
+                      header_style="bold magenta",
+                      box=box.ROUNDED)
+        table.add_column("BATTERY", style="bold")
+        table.add_column("VOLTAGE", min_width=20)
+        table.add_column("TEMPERATURE", min_width=20)
+        for i, value in enumerate(voltages_converted):
+            table.add_row(str(i+1), str(value), str(temperatures_converted[i]))
+        return Panel(table)
 
     def color_cell_voltages(self, value):
         if 3.75 > float(value) > 3.5:
@@ -199,67 +241,12 @@ class CanDisplay:
             color = "white"
         return self.add_color(str("%.3f" % round(value, 3)), color)
 
-    def check_sparsity(self):
-        sparse = False
-        for i in range(len(self.SLAVE_CELLS)):
-            for j in range(len(self.SLAVE_CELLS[i])):
-                if DEBUG:
-                    print(str(self.SLAVE_CELLS[i][j]))
-                if self.SLAVE_CELLS[i][j] == 0.0:
-                    sparse = True
-                    break
-                else:
-                    pass
-        if DEBUG:
-            print(str(sparse))
-        return sparse
-
-    def make_cell_voltage_table(self):
-        if not self.check_sparsity():
-            batt_num2 = "    "
-            batt_num3 = "    "
-            table = Table(show_header=True,
-                    header_style="bold magenta",
-                    box=box.ROUNDED)
-            table.add_column("BATTERY #", style="bold", min_width=10)
-            table.add_column("VOLTAGE", style="bold", min_width=10)
-            table.add_column("BATTERY #", style="bold", min_width=10)
-            table.add_column("VOLTAGE", style="bold", min_width=10)
-            table.add_column("BATTERY #", style="bold", min_width=10)
-            table.add_column("VOLTAGE", style="bold", min_width=10)
-            table.add_column("BATTERY #", style="bold", min_width=10)
-            table.add_column("VOLTAGE", style="bold", min_width=10)
-            i = 0
-            for j in range(len(self.SLAVE_CELLS[i])):
-                battery = int(j / 4) + 1
-                cell_value1 = self.SLAVE_CELLS[0][j]
-                cell_value4 = self.SLAVE_CELLS[3][j]
-                batt_num1 = str(i+1) + '-' + str(battery) + " (" + str(battery) + ")"
-                batt_num4 = str(i+4) + '-' + str(battery) + " (" + str(int(battery + self.SLAVE1_LENGTH + self.SLAVE2_LENGTH + self.SLAVE3_LENGTH)) + ")"
-                try:
-                    cell_value2 = self.SLAVE_CELLS[1][j]
-                    batt_num2 = str(i+2) + '-' + str(battery) + " (" + str(int(battery + self.SLAVE1_LENGTH)) + ")"
-                except IndexError as error:
-                    cell_value2 = "     "
-                    batt_num2 = "    "
-                try:
-                    cell_value3 = self.SLAVE_CELLS[2][j]
-                    batt_num3 = str(i+3) + '-' + str(battery) + " (" + str(int(battery + self.SLAVE1_LENGTH + self.SLAVE2_LENGTH)) + ")"
-                except IndexError as error:
-                    cell_value3 = "     "
-                    batt_num3 = "    "
-                table.add_row(batt_num1, str(cell_value1),
-                              batt_num2, str(cell_value2),
-                              batt_num3, str(cell_value3),
-                              batt_num4, str(cell_value4),
-                              )
-            return table
 
     def read_can_messages(self):
         msg = self.interface.recv(90.0)
         if msg:
             self.make_timestamp()
-            self.bms_params.update_parameters(msg)
+            self.bms_param.update_parameters(msg)
             # data = binascii.hexlify(msg.data).decode(encoding='UTF-8', errors='strict')
             # frame_id = hex(msg.arbitration_id)
             # if frame_id[2:10] in self.CELL_VOLTAGE_FRAMES:
@@ -267,11 +254,28 @@ class CanDisplay:
             #     if DEBUG:
             #         print(str(self.SLAVE_CELLS))
 
+
     def make_layout(self) -> Layout:
         #time = Panel(self.TIMESTAMP, style = Style(color="red", bold=True))
         self.layout.split_column(
             Layout(self.make_header(), name="header", size=3),
-            Layout(self.make_cell_voltage_table()),
+            Layout(name="upper"),
+        )
+
+        self.layout["upper"].split_row(
+            Layout(self.make_cell_values_table()),
+            Layout(name="right"),
+        )
+
+        self.layout["right"].split_column(
+            Layout(name="right-top"),
+            Layout(self.write_errors(), name="right-middle"),
+            Layout(name="right-bottom"),
+        )
+
+        self.layout["right-top"].split_row(
+            Layout(self.update_system_voltages()),
+            Layout(self.update_system_health()),
         )
 
         return self.layout
