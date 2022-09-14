@@ -218,7 +218,7 @@ class CanDisplay:
         header = Panel(self.HEADER_PANEL + self.timestamp(), style=self.HEADER_STYLE)
         return header
 
-    def make_cell_values_table(self, sting_num):
+    def make_cell_values_table(self, string_num):
         table = Table(show_header=True,
                       title="Values",
                       header_style="bold magenta",
@@ -263,7 +263,11 @@ class CanDisplay:
         )
 
         self.layout["upper"].split_row(
-            Layout(self.make_cell_values_table()),
+            Layout(name="string1"),
+            Layout(name="string2"),
+            Layout(name="string3"),
+            Layout(name="string4"),
+            # Layout(self.make_cell_values_table()),
             Layout(name="right"),
         )
 
