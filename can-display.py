@@ -10,6 +10,7 @@ from rich.panel import Panel
 from rich.style import Style
 from rich.table import Table
 from rich.live import Live
+from rich.align import Align
 from rich.text import Text
 
 import cantools
@@ -66,6 +67,7 @@ class BMSParameters:
         self.volt_array = None
         self.temp_array = None
         self.soh_array = None
+        self.soc_array = None
         self.country = None
         self.sku = sku
         self.soc = None
@@ -104,6 +106,7 @@ class BMSParameters:
     def create_arrays(self):
         self.volt_array = [[0.0 for x in range(self.cells_per_string)] for y in range(self.number_of_strings)]
         self.soh_array = [[0.0 for x in range(self.cells_per_string)] for y in range(self.number_of_strings)]
+        self.soc_array = [[0.0 for x in range(self.cells_per_string)] for y in range(self.number_of_strings)]
         self.temp_array = [[0.0 for x in range(self.cells_per_string)] for y in range(self.number_of_strings)]
 
     def update_parameters(self, message):
@@ -198,56 +201,33 @@ class BMSParameters:
             string = decoded['cell_soh_string_number']
             number_of_cells = decoded['cell_soh_number_of_readings']
             starting_cell = decoded['cell_soh_starting_cell']
-            value = 'cell_soh_reading_1'
+            value = 'cell_soh_reading_'
             array = self.soh_array
         if reading_type == 'soc':
             string = decoded['cell_soc_string_number']
             number_of_cells = decoded['cell_soc_number_of_readings']
             starting_cell = decoded['cell_soc_starting_cell']
-            value = 'cell_soc_reading_1'
+            value = 'cell_soc_reading_'
             array = self.soc_array
         elif reading_type == 'temp':
             string = decoded['temperature_string_number']
             number_of_cells = decoded['temperature_number_of_readings']
             starting_cell = decoded['temperature_starting_cell']
-            value = 'temperature_reading_1'
+            value = 'temperature_reading_'
             array = self.temp_array
         elif reading_type == 'volt':
             string = decoded['voltage_string_number']
             number_of_cells = decoded['voltage_number_of_readings']
             starting_cell = decoded['voltage_starting_cell']
-            value = 'voltage_reading_1'
+            value = 'voltage_reading_'
             array = self.volt_array
 
-        # for i in range(number_of_cells):
-        #     reading = value + str(i)
-        #     array[starting_cell - 1 + i][string - 1] = decoded[value]
+        for i in range(number_of_cells):
+            reading = value + str(i+1)
+            array[string-1][starting_cell - 1 + i] = decoded[reading]
         return
 
 
-    def find_voltage_extremes(self):
-        arr_return = self.volt_array
-        for i, blah in enumerate(self.monoblock_voltages):
-            if i ==  self.monoblock_voltages.index(max(self.monoblock_voltages)):
-                arr_return[i] = self.add_color(str("%.3f" % round(val,3)) + "  MAX", self.VOLT_MAX_COLOR)
-            elif i ==  self.monoblock_voltages.index(min(self.monoblock_voltages)):
-                arr_return[i] = self.add_color(str("%.3f" % round(val,3)) + "  MIN", self.VOLT_MIN_COLOR)
-            else:
-                arr_return[i] = self.add_color(str("%.3f" % round(val,3)), self.VOLT_COLOR)
-        return arr_return
-
-
-    def find_temperature_extremes(self):
-        arr_return = [None for x in range(len(self.monoblock_voltages))]
-        for i, blah in enumerate(self.monoblock_temperatures):
-            val = self.monoblock_temperatures[i] - 40
-            if i == self.monoblock_temperatures.index(max(self.monoblock_temperatures)):
-                arr_return[i] = self.add_color(str(val) + "  MAX", self.TEMPERATURE_MAX_COLOR)
-            elif i ==  self.monoblock_temperatures.index(min(self.monoblock_temperatures)):
-                arr_return[i] = self.add_color(str(val) + "  MIN", self.TEMPERATURE_MIN_COLOR)
-            else:
-                arr_return[i] = self.add_color(val, self.TEMPERATURE_COLOR)
-        return arr_return
 
 class CanDisplay:
     "This is a class to display parsed CAN bus data in a TUI"
@@ -286,23 +266,48 @@ class CanDisplay:
 
     def make_header(self) -> Panel:
         text = Text()
-        text.append("Anzen BMS Modbus Interpreter", style = "green")
-        # header = Panel(self.HEADER_PANEL, style=self.HEADER_STYLE)
+        text.append("Anzen BMS Modbus Interpreter", style = "bold green")
         header = Panel(text)
-        # header = Panel(self.HEADER_PANEL + self.timestamp(), style=self.HEADER_STYLE)
         return header
 
     def make_cell_values_table(self, string_num):
-        table = Table(show_header=True,
-                      # title="Values",
+        table = Table(
+                        show_header=True,
+                        title="String " + str(string_num),
+                        header_style="bold magenta",
+                        # box=box.ROUNDED,
+                        box=None,
+                     )
+        table.add_column("VOLTAGE", min_width=7)
+        table.add_column("TEMP", min_width=7)
+        table.add_column("SOH", min_width=7)
+        table.add_column("SOC", min_width=7)
+        for i in range(self.bms_param.cells_per_string):
+            table.add_row(  str(self.bms_param.volt_array[string_num-1][i]),
+                            str(self.bms_param.temp_array[string_num-1][i]),
+                            str(self.bms_param.soh_array[string_num-1][i]),
+                            str(self.bms_param.soc_array[string_num-1][i]),
+                          )
+        return Panel(Align.center(table))
+        # return table
+
+    def make_battery_nums(self):
+        table = Table(
+                      show_header=True,
+                      title="Battery Num",
                       header_style="bold magenta",
-                      box=box.ROUNDED)
-        table.add_column("BATTERY", style="bold")
-        table.add_column("VOLTAGE", min_width=20)
-        table.add_column("TEMPERATURE", min_width=20)
-        for i, value in enumerate(voltages_converted):
-            table.add_row(str(i+1), str(value), str(temperatures_converted[i]))
-        return Panel(table)
+                      # box=box.ROUNDED,
+                      box=None,
+                     )
+        table.add_column("BATTERY", style="bold", min_width = 10)
+        for i in range(self.bms_param.cells_per_string):
+            table.add_row(str(i+1))
+        # table.add_row("")
+        # table.add_row("")
+        # for i in range(self.bms_param.cells_per_string):
+        #     table.add_row(str(i+1))
+        return Panel(Align.center(table))
+        # return table
 
     def make_status_table(self):
         table = Table(show_header=True,
@@ -322,6 +327,36 @@ class CanDisplay:
         table.add_row("FAN001 Status", self.color_status(self.bms_param.status.fan001_state))
         table.add_row("HTR001 Status", self.color_status(self.bms_param.status.htr001_state))
         table.add_row("HTR002 Status", self.color_status(self.bms_param.status.htr002_state))
+        table.add_row("","")
+        table.add_row("","")
+        table.add_row("Supply Volt High", self.color_status(self.bms_param.status.bms_supply_voltage_high_alarm_status))
+        table.add_row("Supply Volt Low", self.color_status(self.bms_param.status.bms_supply_voltage_low_alarm_status))
+        table.add_row("BMS Temp High", self.color_status(self.bms_param.status.bms_module_temp_high_alarm_status))
+        table.add_row("Regen Curr High", self.color_status(self.bms_param.status.regen_current_high_alarm_status))
+        table.add_row("Disch Curr High", self.color_status(self.bms_param.status.discharge_current_high_alarm_status))
+        table.add_row("Pack Volt High", self.color_status(self.bms_param.status.pack_voltage_high_alarm_status))
+        table.add_row("Pack Volt Low", self.color_status(self.bms_param.status.pack_voltage_low_alarm_status))
+        table.add_row("Cell Volt High", self.color_status(self.bms_param.status.cell_voltage_high_alarm_status))
+        table.add_row("Cell Volt Low", self.color_status(self.bms_param.status.cell_voltage_low_alarm_status))
+        table.add_row("Disch Temp High", self.color_status(self.bms_param.status.discharge_cell_temp_high_limit))
+        table.add_row("Disch Temp Low", self.color_status(self.bms_param.status.discharge_cell_temp_low_limit))
+        table.add_row("Charge Temp High", self.color_status(self.bms_param.status.charge_cell_temp_high_limit))
+        table.add_row("Charge Temp Low", self.color_status(self.bms_param.status.charge_cell_temp_low_limit))
+        table.add_row("Cell Volt Diff", self.color_status(self.bms_param.status.cell_voltage_differential_limit))
+        table.add_row("Cell Temp Diff", self.color_status(self.bms_param.status.cell_temp_differential_limit))
+        table.add_row("SOC High", self.color_status(self.bms_param.status.soc_high_limit))
+        table.add_row("SOC Low", self.color_status(self.bms_param.status.soc_low_limit))
+        table.add_row("SOC Diff", self.color_status(self.bms_param.status.cell_soc_differential_limit))
+        table.add_row("Insul Resist", self.color_status(self.bms_param.status.insulation_resistance_limit))
+        table.add_row("Slave1 Temp Bal", self.color_status(self.bms_param.status.slave1_temperature_balance_error))
+        table.add_row("Slave2 Temp Bal", self.color_status(self.bms_param.status.slave2_temperature_balance_error))
+        table.add_row("Slave3 Temp Bal", self.color_status(self.bms_param.status.slave3_temperature_balance_error))
+        table.add_row("Slave1 Volt Bal", self.color_status(self.bms_param.status.slave1_volt_balance_error))
+        table.add_row("Slave2 Volt Bal", self.color_status(self.bms_param.status.slave2_volt_balance_error))
+        table.add_row("Slave3 Volt Bal", self.color_status(self.bms_param.status.slave3_volt_balance_error))
+        table.add_row("Open Wire", self.color_status(self.bms_param.status.cell_volt_acquisition_open_wire))
+        table.add_row("CAN Status", self.color_status(self.bms_param.status.bms_internal_can_status))
+        table.add_row("ISNS001 Status", self.color_status(self.bms_param.status.isns001_status))
         return table
 
     def make_alarm_table(self):
@@ -410,18 +445,19 @@ class CanDisplay:
         )
 
         self.layout["upper"].split_row(
-            Layout(name="string1"),
-            Layout(name="string2"),
-            Layout(name="string3"),
-            Layout(name="string4"),
-            # Layout(self.make_cell_values_table()),
-            Layout(name="right"),
+            Layout(self.make_battery_nums(), name="batt_num", size=15),
+            Layout(self.make_cell_values_table(1), name="string1", size=42),
+            Layout(self.make_cell_values_table(2), name="string2", size=42),
+            Layout(self.make_cell_values_table(3), name="string3", size=42),
+            Layout(self.make_cell_values_table(4), name="string4", size=42),
+            Layout(self.make_status_table(), name="right-middle", size=35),
+            # Layout(name="right"),
         )
 
-        self.layout["right"].split_column(
-            Layout(self.make_status_table(), name="right-middle", size=15),
-            Layout(self.make_alarm_table(), name="right-top", size=35),
-        )
+        # self.layout["right"].split_column(
+        #     Layout(self.make_status_table(), name="right-middle", size=15),
+        #     Layout(self.make_alarm_table(), name="right-top"),
+        # )
 
 
         return self.layout
@@ -429,15 +465,15 @@ class CanDisplay:
 if __name__ == '__main__':
     db = cantools.database.load_file('data/anzen-raymond-48cell-can1.dbc')
     can0 = can.interface.Bus(channel='vcan0', bustype='socketcan')
-    # while True:
-    #     message = can0.recv()
-    #     try:
-    #         print(message.arbitration_id)
-    #         print(db.decode_message(message.arbitration_id, message.data))
-    #     except:
-    #         print("unknown frame")
-    display = CanDisplay(18, can0)
-    with Live(display.make_layout(), screen=True, auto_refresh=False) as live:
-       while True:
-           display.read_can_messages()
-           live.update(display.make_layout())
+    while True:
+        message = can0.recv()
+        try:
+            print(message.arbitration_id)
+            print(db.decode_message(message.arbitration_id, message.data))
+        except:
+            print("unknown frame")
+    # display = CanDisplay(18, can0)
+    # with Live(display.make_layout(), screen=True, auto_refresh=False) as live:
+    #    while True:
+    #        display.read_can_messages()
+    #        live.update(display.make_layout())
