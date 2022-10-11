@@ -1,240 +1,215 @@
-VERSION "ICD v0.3.14"
-
+VERSION "ICD v0.3.15"
 
 NS_ :
-    NS_DESC_
-    CM_
-    BA_DEF_
-    BA_
-    VAL_
-    CAT_DEF_
-    CAT_
-    FILTER
-    BA_DEF_DEF_
-    EV_DATA_
-    ENVVAR_DATA_
-    SGTYPE_
-    SGTYPE_VAL_
-    BA_DEF_SGTYPE_
-    BA_SGTYPE_
-    SIG_TYPE_REF_
-    VAL_TABLE_
-    SIG_GROUP_
-    SIG_VALTYPE_
-    SIGTYPE_VALTYPE_
-    BO_TX_BU_
-    BA_DEF_REL_
-    BA_REL_
-    BA_DEF_DEF_REL_
-    BU_SG_REL_
-    BU_EV_REL_
-    BU_BO_REL_
-    SG_MUL_VAL_
 
 BS_:
-BU_: MASTER SLAVE
 
+BU_: Master Slave
 
-BO_ 1792 CommStatus: 2 MASTER
-   SG_ k5_open    : 0|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ k7_open    : 1|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ k4_open    : 2|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ power_mode : 4|4@1+ (1,0) [0|15]  "" SLAVE
-   SG_ mode_state : 8|8@1+ (1,0) [0|255] "" SLAVE
+BO_ 1792 CommStatus: 2 Slave
+   SG_ k5_request_closed    : 0|1@1+ (1,0) [0|1]   "" Master
+   SG_ k7_request_closed    : 1|1@1+ (1,0) [0|1]   "" Master
+   SG_ k4_request_closed    : 2|1@1+ (1,0) [0|1]   "" Master
+   SG_ power_mode           : 4|4@1+ (1,0) [0|15]  "" Master
+   SG_ mode_state           : 8|8@1+ (1,0) [0|255] "" Master
 
+BO_ 1808 TempMgr: 1 Slave
+   SG_ htr001_request_closed : 0|1@1+ (1,0) [0|0] "" Master
+   SG_ htr002_request_closed : 1|1@1+ (1,0) [0|0] "" Master
+   SG_ fan001_request_closed : 2|1@1+ (1,0) [0|0] "" Master
 
-BO_ 1808 TempMgr: 1 MASTER
-   SG_ htr001_open : 0|1@1+ (1,0) [0|0] "" SLAVE
-   SG_ htr002_open : 1|1@1+ (1,0) [0|0] "" SLAVE
-   SG_ fan001_open : 2|1@1+ (1,0) [0|0] "" SLAVE
+BO_ 1816 ConfigurationOfComm: 1 Slave
+   SG_ configuration_country : 0|4@1+ (1,0) [0|15] "" Master
 
+BO_ 1824 BattReadingsPart1: 8 Master
+   SG_ measured_battery_current :  0|32@1+ (0.01,-1600) [-1600|3000] " Amps"  Slave
+   SG_ measured_battery_voltage : 32|32@1+ (0.01,0)     [0|1000]     " Volts" Slave
 
-BO_ 1816 ConfigurationOfComm: 1 MASTER
-   SG_ configuration_country : 0|4@1+ (1,0) [0|15] "" SLAVE
+BO_ 1825 BattReadingsPart2: 8 Master
+   SG_ maximum_discharge_current :  0|32@1+ (0.01,0) [0|167772.15] " Amps" Slave
+   SG_ maximum_regen_current     : 32|32@1+ (0.01,0) [0|167772.15] " Amps" Slave
 
+BO_ 1826 BattReadingsPart3: 6 Master
+   SG_ maximum_measured_module_temp  :  0|8@1+  (1,-40)   [-40|215]  " Celsius" Slave
+   SG_ minimum_measured_module_temp  :  8|8@1+  (1,-40)   [-40|215]  " Celsius" Slave
+   SG_ minimum_measured_cell_voltage : 16|16@1+ (0.001,0) [0|65.535] " Volts"   Slave
+   SG_ maximum_measured_cell_voltage : 32|16@1+ (0.001,0) [0|65.535] " Volts"   Slave
 
-BO_ 1824 BattReadingsPart1: 8 MASTER
-   SG_ measured_battery_current :  0|32@1+ (0.01,-1600) [-1600|3000] " Amps"  SLAVE
-   SG_ measured_battery_voltage : 32|32@1+ (0.01,0)     [0|1000]     " Volts" SLAVE
+BO_ 1827 BattReadingsPart4: 3 Master
+   SG_ state_of_charge            :  0|8@1+  (1,0)    [0|100]    " Percent" Slave
+   SG_ truck_connector_v4_voltage :  8|16@1+ (0.01,0) [0|655.35] " Volts"   Slave
 
+BO_ 1828 BattChargerReadingsPart1: 8 Master
+   SG_ maximum_system_charging_current :  0|32@1+ (0.01,0) [0|167772.15] " Amps" Slave
+   SG_ j1a_charger_connector_current   : 32|32@1+ (0.01,0) [0|167772.15] " Amps" Slave
 
-BO_ 1825 BattReadingsPart2: 8 MASTER
-   SG_ maximum_discharge_current :  0|32@1+ (0.01,0) [0|167772.15] " Amps" SLAVE
-   SG_ maximum_regen_current     : 32|32@1+ (0.01,0) [0|167772.15] " Amps" SLAVE
+BO_ 1829 BattChargerReadingsPart2: 8 Master
+   SG_ j1b_charger_connector_current : 0|32@1+ (0.01,0) [0|167772.15] " Amps" Slave
+   SG_ k7_charger_contactor_current : 32|32@1+ (0.01,0) [0|167772.15] " Amps" Slave
 
+BO_ 1830 Status: 8 Master
+   SG_ contactor_k5_status                  :  0|2@1+ (1,0) [0|2]  "" Slave
+   SG_ contactor_k4_status                  :  2|2@1+ (1,0) [0|2]  "" Slave
+   SG_ contactor_k7_status                  :  4|2@1+ (1,0) [0|2]  "" Slave
+   SG_ bms_supply_voltage_high_alarm_status :  6|2@1+ (1,0) [0|3]  "" Slave
+   SG_ bms_supply_voltage_low_alarm_status  :  8|2@1+ (1,0) [0|3]  "" Slave
+   SG_ bms_module_temp_high_alarm_status    : 10|2@1+ (1,0) [0|3]  "" Slave
+   SG_ regen_current_high_alarm_status      : 12|2@1+ (1,0) [0|3]  "" Slave
+   SG_ discharge_current_high_alarm_status  : 14|2@1+ (1,0) [0|3]  "" Slave
+   SG_ pack_voltage_high_alarm_status       : 16|2@1+ (1,0) [0|3]  "" Slave
+   SG_ pack_voltage_low_alarm_status        : 18|2@1+ (1,0) [0|3]  "" Slave
+   SG_ cell_voltage_high_alarm_status       : 20|2@1+ (1,0) [0|3]  "" Slave
+   SG_ cell_voltage_low_alarm_status        : 22|2@1+ (1,0) [0|3]  "" Slave
+   SG_ discharge_cell_temp_high_limit       : 24|2@1+ (1,0) [0|3]  "" Slave
+   SG_ discharge_cell_temp_low_limit        : 26|2@1+ (1,0) [0|3]  "" Slave
+   SG_ charge_cell_temp_high_limit          : 28|2@1+ (1,0) [0|3]  "" Slave
+   SG_ charge_cell_temp_low_limit           : 30|2@1+ (1,0) [0|3]  "" Slave
+   SG_ cell_voltage_differential_limit      : 32|2@1+ (1,0) [0|3]  "" Slave
+   SG_ cell_temp_differential_limit         : 34|2@1+ (1,0) [0|3]  "" Slave
+   SG_ soc_high_limit                       : 36|2@1+ (1,0) [0|3]  "" Slave
+   SG_ soc_low_limit                        : 38|2@1+ (1,0) [0|3]  "" Slave
+   SG_ cell_soc_differential_limit          : 40|2@1+ (1,0) [0|3]  "" Slave
+   SG_ insulation_resistance_limit          : 42|2@1+ (1,0) [0|3]  "" Slave
+   SG_ contactor_k4_position                : 44|1@1+ (1,0) [0|1]  "" Slave
+   SG_ contactor_k5_position                : 45|1@1+ (1,0) [0|1]  "" Slave
+   SG_ contactor_k7_position                : 46|1@1+ (1,0) [0|1]  "" Slave
+   SG_ impending_disconnect                 : 47|1@1+ (1,0) [0|1]  "" Slave
+   SG_ slave1_temperature_balance_error     : 48|1@1+ (1,0) [0|1]  "" Slave
+   SG_ slave2_temperature_balance_error     : 49|1@1+ (1,0) [0|1]  "" Slave
+   SG_ slave3_temperature_balance_error     : 50|1@1+ (1,0) [0|1]  "" Slave
+   SG_ slave1_volt_balance_error            : 51|1@1+ (1,0) [0|1]  "" Slave
+   SG_ slave2_volt_balance_error            : 52|1@1+ (1,0) [0|1]  "" Slave
+   SG_ slave3_volt_balance_error            : 53|1@1+ (1,0) [0|1]  "" Slave
+   SG_ cell_volt_acquisition_open_wire      : 54|1@1+ (1,0) [0|1]  "" Slave
+   SG_ bms_internal_can_status              : 55|1@1+ (1,0) [0|1]  "" Slave
+   SG_ power_mode_state                     : 56|4@1+ (1,0) [0|15] "" Slave
+   SG_ isns001_status                       : 60|1@1+ (1,0) [0|1]  "" Slave
+   SG_ htr001_state                         : 61|1@1+ (1,0) [0|1]  "" Slave
+   SG_ htr002_state                         : 62|1@1+ (1,0) [0|1]  "" Slave
+   SG_ fan001_state                         : 63|1@1+ (1,0) [0|1]  "" Slave
 
-BO_ 1826 BattReadingsPart3: 6 MASTER
-   SG_ maximum_measured_module_temp  :  0|8@1+  (1,-40)   [-40|215]  " Celsius" SLAVE
-   SG_ minimum_measured_module_temp  :  8|8@1+  (1,-40)   [-40|215]  " Celsius" SLAVE
-   SG_ minimum_measured_cell_voltage : 16|16@1+ (0.001,0) [0|65.535] " Volts"   SLAVE
-   SG_ maximum_measured_cell_voltage : 32|16@1+ (0.001,0) [0|65.535] " Volts"   SLAVE
+BO_ 1831 ChargingStatus: 2 Master
+   SG_ charge_entry_k5_diagnostic           :  0|2@1+ (1,0) [0|2] "" Slave
+   SG_ pack_charge_overcurrent_alarm        :  2|2@1+ (1,0) [0|3] "" Slave
+   SG_ j1a_charger_overcurrent_alarm_status :  4|1@1+ (1,0) [0|1] "" Slave
+   SG_ j1b_charger_overcurrent_alarm_status :  5|1@1+ (1,0) [0|1] "" Slave
+   SG_ number_chargers_connected            :  6|2@1+ (1,0) [0|3] "" Slave
+   SG_ k7_charger_overcurrent_alarm_status  :  8|1@1+ (1,0) [0|1] "" Slave
+   SG_ etray_location1_alarm_status         :  9|2@1+ (1,0) [0|2] "" Slave
+   SG_ etray_location2_alarm_status         : 11|2@1+ (1,0) [0|2] "" Slave
 
+BO_ 1840 VoltageSumAndOpen: 2 Master
+   SG_ sum_of_series_cell_voltages : 0|16@1+ (0.01,0) [0|655.35] " Volts" Slave
 
-BO_ 1827 BattReadingsPart4: 3 MASTER
-   SG_ state_of_charge            :  0|8@1+  (1,0)    [0|100]    " Percent" SLAVE
-   SG_ truck_connector_v4_voltage :  8|16@1+ (0.01,0) [0|655.35] " Volts"   SLAVE
+BO_ 1856 CellVoltageDetails: 8 Master
+   SG_ voltage_string_number      :  0|4@1+  (1,0)     [0|15]     ""       Slave
+   SG_ voltage_number_of_readings :  4|4@1+  (1,0)     [0|15]     ""       Slave
+   SG_ voltage_starting_cell      :  8|8@1+  (1,0)     [0|255]    ""       Slave
+   SG_ voltage_reading_1          : 16|16@1+ (0.001,0) [0|65.535] " Volts" Slave
+   SG_ voltage_reading_2          : 32|16@1+ (0.001,0) [0|65.535] " Volts" Slave
+   SG_ voltage_reading_3          : 48|16@1+ (0.001,0) [0|65.535] " Volts" Slave
 
+BO_ 1857 CellTemperatureDetails: 8 Master
+   SG_ temperature_string_number      :  0|4@1+ (1,0)   [0|15]    ""         Slave
+   SG_ temperature_number_of_readings :  4|4@1+ (1,0)   [0|15]    ""         Slave
+   SG_ temperature_starting_cell      :  8|8@1+ (1,0)   [0|255]   ""         Slave
+   SG_ temperature_reading_1          : 16|8@1+ (1,-40) [-40|215] " Celsius" Slave
+   SG_ temperature_reading_2          : 24|8@1+ (1,-40) [-40|215] " Celsius" Slave
+   SG_ temperature_reading_3          : 32|8@1+ (1,-40) [-40|215] " Celsius" Slave
+   SG_ temperature_reading_4          : 40|8@1+ (1,-40) [-40|215] " Celsius" Slave
+   SG_ temperature_reading_5          : 48|8@1+ (1,-40) [-40|215] " Celsius" Slave
+   SG_ temperature_reading_6          : 56|8@1+ (1,-40) [-40|215] " Celsius" Slave
 
-BO_ 1828 BattChargerReadingsPart1: 8 MASTER
-   SG_ maximum_system_charging_current :  0|32@1+ (0.01,0) [0|167772.15] " Amps" SLAVE
-   SG_ j1a_charger_connector_current   : 32|32@1+ (0.01,0) [0|167772.15] " Amps" SLAVE
+BO_ 1858 OpenWireFaults: 7 Master
+   SG_ open_wire_string_number       :  0|4@1+ (1,0) [0|15]  "" Slave
+   SG_ open_wire_neg_wire_valid1     :  8|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_neg_wire_status1    :  9|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_number_of_readings1 : 10|6@1+ (1,0) [0|16]  "" Slave
+   SG_ open_wire_status_set1_08      : 16|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set1_07      : 17|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set1_06      : 18|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set1_05      : 19|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set1_04      : 20|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set1_03      : 21|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set1_02      : 22|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set1_01      : 23|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set1_16      : 24|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set1_15      : 25|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set1_14      : 26|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set1_13      : 27|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set1_12      : 28|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set1_11      : 29|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set1_10      : 30|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set1_09      : 31|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_neg_wire_valid2     : 32|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_neg_wire_status2    : 33|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_number_of_readings2 : 34|6@1+ (1,0) [0|16]  "" Slave
+   SG_ open_wire_status_set2_08      : 40|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set2_07      : 41|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set2_06      : 42|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set2_05      : 43|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set2_04      : 44|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set2_03      : 45|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set2_02      : 46|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set2_01      : 47|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set2_16      : 48|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set2_15      : 49|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set2_14      : 50|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set2_13      : 51|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set2_12      : 52|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set2_11      : 53|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set2_10      : 54|1@1+ (1,0) [0|1]   "" Slave
+   SG_ open_wire_status_set2_09      : 55|1@1+ (1,0) [0|1]   "" Slave
 
+BO_ 1872 StateOfHealth: 3 Master
+   SG_ minimum_state_of_health : 0|8@1+  (1,0) [0|100]   " Percent" Slave
+   SG_ insulation_resistance   : 8|16@1+ (1,0) [0|65535] " kOhms"   Slave
 
-BO_ 1829 BattChargerReadingsPart2: 8 MASTER
-   SG_ j1b_charger_connector_current : 0|32@1+ (0.01,0) [0|167772.15] " Amps" SLAVE
-   SG_ k7_charger_contactor_current : 32|32@1+ (0.01,0) [0|167772.15] " Amps" SLAVE
+BO_ 1873 CellStateOfHealth: 8 Master
+   SG_ cell_soh_string_number      :  0|4@1+ (1,0) [0|15]  ""         Slave
+   SG_ cell_soh_number_of_readings :  4|4@1+ (1,0) [0|15]  ""         Slave
+   SG_ cell_soh_starting_cell      :  8|8@1+ (1,0) [0|255] ""         Slave
+   SG_ cell_soh_reading_1          : 16|8@1+ (1,0) [0|100] " Percent" Slave
+   SG_ cell_soh_reading_2          : 24|8@1+ (1,0) [0|100] " Percent" Slave
+   SG_ cell_soh_reading_3          : 32|8@1+ (1,0) [0|100] " Percent" Slave
+   SG_ cell_soh_reading_4          : 40|8@1+ (1,0) [0|100] " Percent" Slave
+   SG_ cell_soh_reading_5          : 48|8@1+ (1,0) [0|100] " Percent" Slave
+   SG_ cell_soh_reading_6          : 56|8@1+ (1,0) [0|100] " Percent" Slave
 
+BO_ 1874 ConfigurationOfBMSM: 6 Master
+   SG_ kpm_firmware_version_1  :  0|4@1+ (1,0) [0|15]  "" Slave
+   SG_ kpm_firmware_version_2  :  4|4@1+ (1,0) [0|15]  "" Slave
+   SG_ kpm_firmware_version_3  :  8|8@1+ (1,0) [0|255] "" Slave
+   SG_ kpm_firmware_version_4  : 16|8@1+ (1,0) [0|255] "" Slave
+   SG_ kpm_firmware_version_5  : 24|8@1+ (1,0) [0|255] "" Slave
+   SG_ configuration_sku       : 32|8@1+ (1,0) [0|255] "" Slave
+   SG_ configuration_country   : 40|4@1+ (1,0) [0|15]  "" Slave
 
-BO_ 1830 Status: 8 MASTER
-   SG_ contactor_k5_status                  :  0|2@1+ (1,0) [0|2]  "" SLAVE
-   SG_ contactor_k4_status                  :  2|2@1+ (1,0) [0|2]  "" SLAVE
-   SG_ contactor_k7_status                  :  4|2@1+ (1,0) [0|2]  "" SLAVE
-   SG_ bms_supply_voltage_high_alarm_status :  6|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ bms_supply_voltage_low_alarm_status  :  8|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ bms_module_temp_high_alarm_status    : 10|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ regen_current_high_alarm_status      : 12|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ discharge_current_high_alarm_status  : 14|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ pack_voltage_high_alarm_status       : 16|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ pack_voltage_low_alarm_status        : 18|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ cell_voltage_high_alarm_status       : 20|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ cell_voltage_low_alarm_status        : 22|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ discharge_cell_temp_high_limit       : 24|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ discharge_cell_temp_low_limit        : 26|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ charge_cell_temp_high_limit          : 28|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ charge_cell_temp_low_limit           : 30|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ cell_voltage_differential_limit      : 32|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ cell_temp_differential_limit         : 34|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ soc_high_limit                       : 36|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ soc_low_limit                        : 38|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ cell_soc_differential_limit          : 40|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ insulation_resistance_limit          : 42|2@1+ (1,0) [0|3]  "" SLAVE
-   SG_ contactor_k4_position                : 44|1@1+ (1,0) [0|1]  "" SLAVE
-   SG_ contactor_k5_position                : 45|1@1+ (1,0) [0|1]  "" SLAVE
-   SG_ contactor_k7_position                : 46|1@1+ (1,0) [0|1]  "" SLAVE
-   SG_ impending_disconnect                 : 47|1@1+ (1,0) [0|1]  "" SLAVE
-   SG_ slave1_temperature_balance_error     : 48|1@1+ (1,0) [0|1]  "" SLAVE
-   SG_ slave2_temperature_balance_error     : 49|1@1+ (1,0) [0|1]  "" SLAVE
-   SG_ slave3_temperature_balance_error     : 50|1@1+ (1,0) [0|1]  "" SLAVE
-   SG_ slave1_volt_balance_error            : 51|1@1+ (1,0) [0|1]  "" SLAVE
-   SG_ slave2_volt_balance_error            : 52|1@1+ (1,0) [0|1]  "" SLAVE
-   SG_ slave3_volt_balance_error            : 53|1@1+ (1,0) [0|1]  "" SLAVE
-   SG_ cell_volt_acquisition_open_wire      : 54|1@1+ (1,0) [0|1]  "" SLAVE
-   SG_ bms_internal_can_status              : 55|1@1+ (1,0) [0|1]  "" SLAVE
-   SG_ power_mode_state                     : 56|4@1+ (1,0) [0|15] "" SLAVE
-   SG_ isns001_status                       : 60|1@1+ (1,0) [0|1]  "" SLAVE
+BO_ 1875 CellStateOfCharge: 8 Master
+   SG_ cell_soc_string_number      :  0|4@1+ (1,0) [0|15]  ""         Slave
+   SG_ cell_soc_number_of_readings :  4|4@1+ (1,0) [0|15]  ""         Slave
+   SG_ cell_soc_starting_cell      :  8|8@1+ (1,0) [0|255] ""         Slave
+   SG_ cell_soc_reading_1          : 16|8@1+ (1,0) [0|100] " Percent" Slave
+   SG_ cell_soc_reading_2          : 24|8@1+ (1,0) [0|100] " Percent" Slave
+   SG_ cell_soc_reading_3          : 32|8@1+ (1,0) [0|100] " Percent" Slave
+   SG_ cell_soc_reading_4          : 40|8@1+ (1,0) [0|100] " Percent" Slave
+   SG_ cell_soc_reading_5          : 48|8@1+ (1,0) [0|100] " Percent" Slave
+   SG_ cell_soc_reading_6          : 56|8@1+ (1,0) [0|100] " Percent" Slave
 
+BO_ 1876 TrayTempMeasurement: 4 Master
+   SG_ location1_primary_temp    :  0|8@1+ (1,-40) [-40|215] " Celsius" Slave
+   SG_ location1_secondary_temp  :  8|8@1+ (1,-40) [-40|215] " Celsius" Slave
+   SG_ location2_primary_temp    : 16|8@1+ (1,-40) [-40|215] " Celsius" Slave
+   SG_ location2_secondary_temp  : 24|8@1+ (1,-40) [-40|215] " Celsius" Slave
 
-BO_ 1831 ChargingStatus: 2 MASTER
-   SG_ charge_entry_k5_diagnostic           : 0|2@1+ (1,0) [0|2] "" SLAVE
-   SG_ pack_charge_overcurrent_alarm        : 2|2@1+ (1,0) [0|3] "" SLAVE
-   SG_ j1a_charger_overcurrent_alarm_status : 4|1@1+ (1,0) [0|1] "" SLAVE
-   SG_ j1b_charger_overcurrent_alarm_status : 5|1@1+ (1,0) [0|1] "" SLAVE
-   SG_ number_chargers_connected            : 6|2@1+ (1,0) [0|3] "" SLAVE
-   SG_ k7_charger_overcurrent_alarm_status  : 8|1@1+ (1,0) [0|1] "" SLAVE
-
-
-BO_ 1840 VoltageSumAndOpen: 2 MASTER
-   SG_ sum_of_series_cell_voltages : 0|16@1+ (0.01,0) [0|655.35] " Volts" SLAVE
-
-
-BO_ 1856 CellVoltageDetails: 8 MASTER
-   SG_ voltage_string_number      :  0|4@1+  (1,0)     [0|15]     ""       SLAVE
-   SG_ voltage_number_of_readings :  4|4@1+  (1,0)     [0|15]     ""       SLAVE
-   SG_ voltage_starting_cell      :  8|8@1+  (1,0)     [0|255]    ""       SLAVE
-   SG_ voltage_reading_1          : 16|16@1+ (0.001,0) [0|65.535] " Volts" SLAVE
-   SG_ voltage_reading_2          : 32|16@1+ (0.001,0) [0|65.535] " Volts" SLAVE
-   SG_ voltage_reading_3          : 48|16@1+ (0.001,0) [0|65.535] " Volts" SLAVE
-
-
-BO_ 1857 CellTemperatureDetails: 8 MASTER
-   SG_ temperature_string_number      :  0|4@1+ (1,0)   [0|15]    ""         SLAVE
-   SG_ temperature_number_of_readings :  4|4@1+ (1,0)   [0|15]    ""         SLAVE
-   SG_ temperature_starting_cell      :  8|8@1+ (1,0)   [0|255]   ""         SLAVE
-   SG_ temperature_reading_1          : 16|8@1+ (1,-40) [-40|215] " Celsius" SLAVE
-   SG_ temperature_reading_2          : 24|8@1+ (1,-40) [-40|215] " Celsius" SLAVE
-   SG_ temperature_reading_3          : 32|8@1+ (1,-40) [-40|215] " Celsius" SLAVE
-   SG_ temperature_reading_4          : 40|8@1+ (1,-40) [-40|215] " Celsius" SLAVE
-   SG_ temperature_reading_5          : 48|8@1+ (1,-40) [-40|215] " Celsius" SLAVE
-   SG_ temperature_reading_6          : 56|8@1+ (1,-40) [-40|215] " Celsius" SLAVE
-
-
-BO_ 1858 OpenWireFaults: 8 MASTER
-   SG_ open_wire_string_number       :  0|4@1+ (1,0) [0|15]  "" SLAVE
-   SG_ open_wire_neg_wire_valid1     :  8|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_neg_wire_status1    :  9|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_number_of_readings1 : 10|6@1+ (1,0) [0|16]  "" SLAVE
-   SG_ open_wire_status_set1_08      : 16|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set1_07      : 17|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set1_06      : 18|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set1_05      : 19|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set1_04      : 20|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set1_03      : 21|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set1_02      : 22|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set1_01      : 23|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set1_16      : 24|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set1_15      : 25|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set1_14      : 26|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set1_13      : 27|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set1_12      : 28|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set1_11      : 29|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set1_10      : 30|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set1_09      : 31|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_neg_wire_valid2     : 32|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_neg_wire_status2    : 33|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_number_of_readings2 : 34|6@1+ (1,0) [0|16]  "" SLAVE
-   SG_ open_wire_status_set2_08      : 40|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set2_07      : 41|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set2_06      : 42|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set2_05      : 43|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set2_04      : 44|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set2_03      : 45|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set2_02      : 46|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set2_01      : 47|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set2_16      : 48|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set2_15      : 49|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set2_14      : 50|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set2_13      : 51|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set2_12      : 52|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set2_11      : 53|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set2_10      : 54|1@1+ (1,0) [0|1]   "" SLAVE
-   SG_ open_wire_status_set2_09      : 55|1@1+ (1,0) [0|1]   "" SLAVE
-
-
-BO_ 1872 StateOfHealth: 3 MASTER
-   SG_ minimum_state_of_health : 0|8@1+  (1,0) [0|100]   " Percent" SLAVE
-   SG_ insulation_resistance   : 8|16@1+ (1,0) [0|65535] " kOhms"   SLAVE
-
-
-BO_ 1873 CellStateOfHealth: 8 MASTER
-   SG_ cell_soh_string_number      :  0|4@1+ (1,0) [0|15]  ""         SLAVE
-   SG_ cell_soh_number_of_readings :  4|4@1+ (1,0) [0|15]  ""         SLAVE
-   SG_ cell_soh_starting_cell      :  8|8@1+ (1,0) [0|255] ""         SLAVE
-   SG_ cell_soh_reading_1          : 16|8@1+ (1,0) [0|100] " Percent" SLAVE
-   SG_ cell_soh_reading_2          : 24|8@1+ (1,0) [0|100] " Percent" SLAVE
-   SG_ cell_soh_reading_3          : 32|8@1+ (1,0) [0|100] " Percent" SLAVE
-   SG_ cell_soh_reading_4          : 40|8@1+ (1,0) [0|100] " Percent" SLAVE
-   SG_ cell_soh_reading_5          : 48|8@1+ (1,0) [0|100] " Percent" SLAVE
-   SG_ cell_soh_reading_6          : 56|8@1+ (1,0) [0|100] " Percent" SLAVE
-
-
-BO_ 1874 ConfigurationOfBMSM: 6 MASTER
-   SG_ kpm_firmware_version_1  :  0|4@1+ (1,0) [0|15]  "" SLAVE
-   SG_ kpm_firmware_version_2  :  4|4@1+ (1,0) [0|15]  "" SLAVE
-   SG_ kpm_firmware_version_3  :  8|8@1+ (1,0) [0|255] "" SLAVE
-   SG_ kpm_firmware_version_4  : 16|8@1+ (1,0) [0|255] "" SLAVE
-   SG_ kpm_firmware_version_5  : 24|8@1+ (1,0) [0|255] "" SLAVE
-   SG_ configuration_sku       : 32|8@1+ (1,0) [0|255] "" SLAVE
-   SG_ configuration_country   : 40|4@1+ (1,0) [0|15]  "" SLAVE
-
-
-VAL_ 1792 k4_open 0 "Open" 1 "Closed";
-VAL_ 1792 k5_open 0 "Open" 1 "Closed";
-VAL_ 1792 k7_open 0 "Open" 1 "Closed";
+VAL_ 1792 k4_request_closed 0 "Open" 1 "Closed";
+VAL_ 1792 k5_request_closed 0 "Open" 1 "Closed";
+VAL_ 1792 k7_request_closed 0 "Open" 1 "Closed";
 VAL_ 1792 power_mode 0 "Undefined" 1 "Startup" 2 "On" 3 "Shutdown Req" 4 "Shutdown" 5 "Imminent Off";
 
-VAL_ 1808 htr001_open 0 "Open" 1 "Closed";
-VAL_ 1808 htr002_open 0 "Open" 1 "Closed";
-VAL_ 1808 fan001_open 0 "Open" 1 "Closed";
+VAL_ 1808 htr001_request_closed 0 "Open" 1 "Closed";
+VAL_ 1808 htr002_request_closed 0 "Open" 1 "Closed";
+VAL_ 1808 fan001_request_closed 0 "Open" 1 "Closed";
 
 VAL_ 1816 configuration_country 0 "US" 1 "CA";
 
@@ -274,28 +249,51 @@ VAL_ 1830 cell_volt_acquisition_open_wire 0 "OK" 1 "Balancing cell voltage out o
 VAL_ 1830 bms_internal_can_status 0 "OK" 1 "CAN Lost";
 VAL_ 1830 isns001_status 0 "OK" 1 "Fault";
 VAL_ 1830 power_mode_state 0 "Undefined" 1 "Startup" 2 "On" 3 "Shutdown Req" 4 "Shutdown" 5 "Imminent Off";
+VAL_ 1830 htr001_state 0 "Off" 1 "On";
+VAL_ 1830 htr002_state 0 "Off" 1 "On";
+VAL_ 1830 fan001_state 0 "Off" 1 "On";
 
 VAL_ 1831 charge_entry_k5_diagnostic 0 "OK" 1 "Stuck Closed" 2 "Stuck Open";
 VAL_ 1831 pack_charge_overcurrent_alarm 0 "OK" 1 "Over current";
 VAL_ 1831 j1a_charger_overcurrent_alarm_status 0 "OK" 1 "Over current";
 VAL_ 1831 j1b_charger_overcurrent_alarm_status 0 "OK" 1 "Over current";
 VAL_ 1831 k7_charger_overcurrent_alarm_status 0 "OK" 1 "Over current";
+VAL_ 1831 etray_location1_alarm_status 0 "OK" 1 "Serious" 2 "Critical";
+VAL_ 1831 etray_location2_alarm_status 0 "OK" 1 "Serious" 2 "Critical";
 
+VAL_ 1858 open_wire_neg_wire_status1 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_neg_wire_status2 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set1_01 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set1_02 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set1_03 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set1_04 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set1_05 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set1_06 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set1_07 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set1_08 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set1_09 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set1_10 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set1_11 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set1_12 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set1_13 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set1_14 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set1_15 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set1_16 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set2_01 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set2_02 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set2_03 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set2_04 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set2_05 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set2_06 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set2_07 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set2_08 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set2_09 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set2_10 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set2_11 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set2_12 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set2_13 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set2_14 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set2_15 0 "OK" 1 "Wire Fault";
+VAL_ 1858 open_wire_status_set2_16 0 "OK" 1 "Wire Fault";
 
 VAL_ 1874 configuration_country 0 "US" 1 "CA";
-
-
-BA_DEF_ SG_ "SPN" INT 0 524287;
-BA_DEF_ SG_ "SigType" STRING ;
-BA_DEF_ BO_ "VFrameFormat" ENUM "StandardCAN","ExtendedCAN","reserved","J1939PG";
-BA_DEF_ BO_ "FilterLabel" INT 0 1;
-BA_DEF_ BO_ "matchingcriteria" INT 0 0;
-BA_DEF_ BO_ "GenMsgBackgroundColor" STRING ;
-BA_DEF_ BO_ "GenMsgForegroundColor" STRING ;
-BA_DEF_DEF_ "SPN" 0;
-BA_DEF_DEF_ "SigType" "";
-BA_DEF_DEF_ "VFrameFormat" "J1939PG";
-BA_DEF_DEF_ "FilterLabel" 1;
-BA_DEF_DEF_ "matchingcriteria" 1;
-BA_DEF_DEF_ "GenMsgBackgroundColor" "#ffffff";
-BA_DEF_DEF_ "GenMsgForegroundColor" "#000000";
